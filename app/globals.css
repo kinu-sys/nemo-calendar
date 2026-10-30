@@ -1,0 +1,51 @@
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@600;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-color: #fbf5f4;
+  --card-bg: #ffffff;
+  --card-border: #f2e3df;
+  --card-shadow: 0 8px 24px rgba(215, 175, 168, 0.12);
+
+  --text-main: #5c4d49;
+  --text-muted: #9e8e8a;
+  --text-light: #cfc2be;
+
+  --accent-pink: #e89587;
+  --accent-pink-hover: #dc8475;
+  --accent-pink-soft: #fcf1ee;
+  --accent-pink-border: #ebd3cd;
+  --accent-pink-badge: #faeee9;
+
+  --sun-color: #d66d5e;
+  --sat-color: #6e8aa6;
+  --weekday-color: #8c7a75;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  font-family: 'Zen Maru Gothic', -apple-system, BlinkMacSystemFont, sans-serif;
+  letter-spacing: 0.02em;
+  min-height: 100vh;
+}
+
+/* カスタムスクロールバー */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #faf4f2;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb {
+  background: #ebd3cd;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #e89587;
+}

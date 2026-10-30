@@ -1,0 +1,1639 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nemo Calendar</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@600;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      /* やさしいくすみピンク × かわいいイラスト テーマ */
+      --bg-color: #fbf5f4; /* やさしいくすみピンクベージュ */
+      --card-bg: #ffffff;
+      --card-border: #f2e3df;
+      --card-shadow: 0 8px 24px rgba(215, 175, 168, 0.12);
+      
+      --text-main: #5c4d49; /* まろやかなココアブラウン */
+      --text-muted: #9e8e8a; /* くすみピンクグレー */
+      --text-light: #cfc2be;
+      
+      --accent-pink: #e89587; /* メインのやさしいくすみピンク */
+      --accent-pink-hover: #dc8475;
+      --accent-pink-soft: #fcf1ee; /* ごく淡いピンク背景 */
+      --accent-pink-border: #ebd3cd;
+      --accent-pink-badge: #faeee9;
+      
+      --sun-color: #d66d5e; /* 日曜日・くすみ赤 */
+      --sat-color: #6e8aa6; /* 土曜日・くすみ青 */
+      --weekday-color: #8c7a75;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      font-family: 'Zen Maru Gothic', -apple-system, sans-serif;
+      padding: 24px 16px;
+      display: flex;
+      justify-content: center;
+      letter-spacing: 0.02em;
+      min-height: 100vh;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 1080px;
+    }
+
+    /* ヘッダー */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding: 0 4px;
+    }
+
+    .header-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-cat-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      background: #ffffff;
+      border: 1px solid var(--card-border);
+      border-radius: 50%;
+      box-shadow: 0 4px 12px rgba(215, 175, 168, 0.15);
+    }
+
+    .logo-cat-icon svg {
+      width: 28px;
+      height: 28px;
+    }
+
+    h1.brand-title {
+      font-family: 'Quicksand', 'Zen Maru Gothic', sans-serif;
+      font-size: 30px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: var(--accent-pink);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .icon-manage-btn {
+      background: #ffffff;
+      border: 1px solid var(--card-border);
+      color: var(--text-main);
+      padding: 7px 15px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 2px 8px rgba(215, 175, 168, 0.08);
+      transition: all 0.2s;
+    }
+
+    .icon-manage-btn:hover {
+      background: var(--accent-pink-soft);
+      border-color: var(--accent-pink-border);
+      color: var(--accent-pink);
+    }
+
+    /* メインコンテンツ配置（2カラム） */
+    .main-content {
+      display: grid;
+      grid-template-columns: 1fr 310px;
+      gap: 20px;
+      align-items: start;
+    }
+
+    @media (max-width: 860px) {
+      .main-content {
+        grid-template-columns: 1fr;
+      }
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+      }
+      .header-actions {
+        width: 100%;
+        justify-content: flex-end;
+      }
+    }
+
+    /* カレンダー側 */
+    .calendar-section {
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ナビゲーション */
+    .calendar-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      padding: 0 4px;
+    }
+
+    .month-nav-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .month-label {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-main);
+      letter-spacing: 0.05em;
+    }
+
+    .nav-controls {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .nav-btn {
+      background-color: #ffffff;
+      border: 1px solid var(--card-border);
+      padding: 6px 14px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 700;
+      font-family: inherit;
+      color: var(--text-main);
+      transition: all 0.2s;
+      box-shadow: 0 2px 6px rgba(215, 175, 168, 0.08);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .nav-btn:hover {
+      background-color: var(--accent-pink-soft);
+      border-color: var(--accent-pink-border);
+      color: var(--accent-pink);
+    }
+
+    .nav-btn.today-btn {
+      background-color: var(--accent-pink-soft);
+      border-color: var(--accent-pink-border);
+      color: var(--accent-pink);
+    }
+
+    .nav-btn.today-btn:hover {
+      background-color: var(--accent-pink);
+      color: #ffffff;
+      border-color: var(--accent-pink);
+    }
+
+    /* カレンダーカード */
+    .calendar-card {
+      background: var(--card-bg);
+      border-radius: 20px;
+      border: 1px solid var(--card-border);
+      box-shadow: var(--card-shadow);
+      overflow: hidden;
+    }
+
+    .weekdays {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      background: #faf4f3;
+      border-bottom: 1px solid var(--card-border);
+      text-align: center;
+      font-size: 13px;
+      padding: 10px 0;
+      color: var(--weekday-color);
+      font-weight: 700;
+    }
+
+    .weekdays div:nth-child(1) { color: var(--sun-color); }
+    .weekdays div:nth-child(7) { color: var(--sat-color); }
+
+    .days-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+    }
+
+    .day-cell {
+      min-height: 92px;
+      border-right: 1px solid #f7edea;
+      border-bottom: 1px solid #f7edea;
+      padding: 6px 7px;
+      cursor: pointer;
+      transition: all 0.15s ease-in-out;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .day-cell:nth-child(7n) {
+      border-right: none;
+    }
+
+    .day-cell:hover {
+      background-color: #fdf7f5;
+    }
+
+    .day-cell.selected {
+      background-color: #fdf5f3;
+      box-shadow: inset 0 0 0 2px var(--accent-pink);
+    }
+
+    .day-cell.other-month {
+      background-color: #faf7f6;
+    }
+
+    .day-cell.other-month .day-number {
+      color: var(--text-light);
+    }
+
+    .day-cell.today {
+      background-color: #fef9f8;
+    }
+
+    .day-number {
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 3px;
+      color: var(--text-main);
+    }
+
+    .day-cell.today .day-number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      background-color: var(--accent-pink);
+      color: #ffffff !important;
+      border-radius: 50%;
+      box-shadow: 0 2px 6px rgba(232, 149, 135, 0.4);
+    }
+
+    .day-cell.sunday .day-number { color: var(--sun-color); }
+    .day-cell.saturday .day-number { color: var(--sat-color); }
+
+    /* 予定バッジ */
+    .event-badge {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      background: var(--accent-pink-badge);
+      border: 1px solid var(--accent-pink-border);
+      border-radius: 8px;
+      padding: 2px 5px;
+      margin-top: 3px;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-main);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      transition: transform 0.1s;
+    }
+
+    .event-badge:hover {
+      transform: scale(1.02);
+    }
+
+    .event-badge-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .event-badge-icon .custom-svg-icon {
+      width: 14px;
+      height: 14px;
+    }
+
+    .event-badge-icon .emoji-icon {
+      font-size: 12px;
+      line-height: 1;
+    }
+
+    /* 右サイドパネル */
+    .side-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .side-card {
+      background: var(--card-bg);
+      border-radius: 20px;
+      border: 1px solid var(--card-border);
+      box-shadow: var(--card-shadow);
+      padding: 18px;
+    }
+
+    .side-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      padding-bottom: 10px;
+      border-bottom: 1px dashed var(--card-border);
+    }
+
+    .side-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .add-btn-small {
+      background: var(--accent-pink);
+      color: #ffffff;
+      border: none;
+      border-radius: 16px;
+      padding: 5px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 2px 8px rgba(232, 149, 135, 0.3);
+    }
+
+    .add-btn-small:hover {
+      background: var(--accent-pink-hover);
+      transform: translateY(-1px);
+    }
+
+    /* サイドパネル内の予定一覧 */
+    .event-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      min-height: 70px;
+    }
+
+    .event-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #faf4f2;
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 8px 10px;
+      font-size: 13px;
+    }
+
+    .event-item-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      overflow: hidden;
+    }
+
+    .event-item-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      width: 22px;
+      height: 22px;
+    }
+
+    .event-item-icon .custom-svg-icon {
+      width: 20px;
+      height: 20px;
+    }
+
+    .event-item-icon .emoji-icon {
+      font-size: 18px;
+    }
+
+    .event-item-text {
+      color: var(--text-main);
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .event-item-delete {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 14px;
+      padding: 2px 6px;
+      border-radius: 6px;
+      transition: all 0.2s;
+    }
+
+    .event-item-delete:hover {
+      color: var(--sun-color);
+      background: #fde8e5;
+    }
+
+    .no-events {
+      text-align: center;
+      padding: 18px 0;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    /* よく使うアイコン */
+    .side-subtitle {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .subtitle-left {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .text-link-btn {
+      background: none;
+      border: none;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--accent-pink);
+      cursor: pointer;
+      font-family: inherit;
+      padding: 2px 4px;
+    }
+
+    .text-link-btn:hover {
+      text-decoration: underline;
+    }
+
+    .quick-icons-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .quick-icon-btn {
+      background: #faf4f2;
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 8px 4px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.15s ease-in-out;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      font-family: inherit;
+    }
+
+    .quick-icon-btn:hover {
+      background: var(--accent-pink-soft);
+      border-color: var(--accent-pink-border);
+      transform: translateY(-2px);
+      box-shadow: 0 3px 8px rgba(232, 149, 135, 0.15);
+    }
+
+    .quick-icon-visual {
+      width: 28px;
+      height: 28px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: #ffffff;
+      border-radius: 50%;
+      box-shadow: 0 2px 5px rgba(215, 175, 168, 0.12);
+    }
+
+    .quick-icon-visual .custom-svg-icon {
+      width: 20px;
+      height: 20px;
+    }
+
+    .quick-icon-visual .emoji-icon {
+      font-size: 16px;
+    }
+
+    .quick-icon-label {
+      font-size: 10px;
+      color: var(--text-muted);
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+    }
+
+    /* 右下のイラスト（囲みなし・ナチュラル配置） */
+    .mascot-standalone {
+      text-align: center;
+      padding: 6px 0 10px 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .mascot-img {
+      max-width: 145px;
+      width: 100%;
+      height: auto;
+      display: inline-block;
+      transition: transform 0.25s ease;
+      filter: drop-shadow(0 4px 10px rgba(215, 175, 168, 0.15));
+    }
+
+    .mascot-img:hover {
+      transform: translateY(-3px) scale(1.03);
+    }
+
+    /* モーダル共通 */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(92, 77, 73, 0.35);
+      backdrop-filter: blur(3px);
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+    }
+
+    .modal {
+      background: var(--card-bg);
+      padding: 24px;
+      border-radius: 20px;
+      width: 90%;
+      max-width: 440px;
+      box-shadow: 0 12px 36px rgba(180, 130, 120, 0.2);
+      border: 1px solid var(--card-border);
+      font-family: inherit;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .modal-header h3 {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--accent-pink);
+    }
+
+    .modal-close-icon {
+      background: none;
+      border: none;
+      font-size: 18px;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 50%;
+      line-height: 1;
+    }
+
+    .modal-close-icon:hover {
+      color: var(--text-main);
+      background: #f5ece9;
+    }
+
+    .modal-hint {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+
+    .icon-selector {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-bottom: 16px;
+      max-height: 200px;
+      overflow-y: auto;
+      padding: 4px;
+    }
+
+    .icon-choice {
+      padding: 8px 4px;
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      text-align: center;
+      cursor: pointer;
+      background: #faf4f2;
+      color: var(--text-main);
+      transition: all 0.15s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .icon-choice-visual {
+      width: 32px;
+      height: 32px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: #ffffff;
+      border-radius: 50%;
+      box-shadow: 0 2px 4px rgba(215, 175, 168, 0.1);
+    }
+
+    .icon-choice-visual .custom-svg-icon {
+      width: 22px;
+      height: 22px;
+    }
+
+    .icon-choice-visual .emoji-icon {
+      font-size: 18px;
+    }
+
+    .icon-choice-label {
+      font-size: 10px;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+    }
+
+    .icon-choice:hover, .icon-choice.selected {
+      border-color: var(--accent-pink);
+      background: var(--accent-pink-soft);
+      transform: translateY(-2px);
+      box-shadow: 0 3px 8px rgba(232, 149, 135, 0.2);
+    }
+
+    .icon-choice.selected .icon-choice-label {
+      color: var(--accent-pink);
+      font-weight: 700;
+    }
+
+    .input-text {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      font-size: 14px;
+      font-family: inherit;
+      color: var(--text-main);
+      margin-bottom: 20px;
+      outline: none;
+      background-color: #faf4f2;
+      transition: all 0.2s;
+    }
+
+    .input-text:focus {
+      border-color: var(--accent-pink);
+      background-color: #ffffff;
+      box-shadow: 0 0 0 3px rgba(232, 149, 135, 0.15);
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    .btn {
+      padding: 9px 18px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+    }
+
+    .btn-cancel {
+      background: #f2e7e4;
+      color: var(--text-muted);
+    }
+
+    .btn-cancel:hover {
+      background: #ebdcd7;
+      color: var(--text-main);
+    }
+
+    .btn-save {
+      background: var(--accent-pink);
+      color: white;
+      box-shadow: 0 3px 10px rgba(232, 149, 135, 0.3);
+    }
+
+    .btn-save:hover {
+      background: var(--accent-pink-hover);
+    }
+
+    /* アイコン管理モーダル専用スタイル */
+    .section-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 8px;
+    }
+
+    .add-icon-section {
+      background: #faf4f2;
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 12px;
+      margin-bottom: 16px;
+    }
+
+    .add-icon-form {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .input-char {
+      width: 58px;
+      text-align: center;
+      font-size: 20px;
+      padding: 7px;
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      outline: none;
+      background: #ffffff;
+      font-family: inherit;
+    }
+
+    .input-char:focus, .input-label:focus {
+      border-color: var(--accent-pink);
+    }
+
+    .input-label {
+      flex: 1;
+      padding: 9px 12px;
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      outline: none;
+      background: #ffffff;
+      font-family: inherit;
+      font-size: 13px;
+    }
+
+    .preset-emojis {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 6px;
+    }
+
+    .preset-hint {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .preset-emoji-list {
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+    }
+
+    .preset-btn {
+      background: #ffffff;
+      border: 1px solid var(--card-border);
+      border-radius: 6px;
+      padding: 2px 5px;
+      font-size: 14px;
+      cursor: pointer;
+      line-height: 1.2;
+      transition: all 0.15s;
+    }
+
+    .preset-btn:hover {
+      background: var(--accent-pink-soft);
+      border-color: var(--accent-pink-border);
+      transform: scale(1.15);
+    }
+
+    .current-icons-section {
+      margin-bottom: 16px;
+    }
+
+    .icon-chips-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      max-height: 140px;
+      overflow-y: auto;
+      padding: 6px;
+      background: #faf4f2;
+      border-radius: 12px;
+      border: 1px solid var(--card-border);
+    }
+
+    .icon-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #ffffff;
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 5px 8px;
+      font-size: 12px;
+      color: var(--text-main);
+      box-shadow: 0 1px 4px rgba(215, 175, 168, 0.08);
+    }
+
+    .icon-chip-visual {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .icon-chip-visual .custom-svg-icon {
+      width: 16px;
+      height: 16px;
+    }
+
+    .icon-chip-visual .emoji-icon {
+      font-size: 14px;
+    }
+
+    .icon-chip-label {
+      font-weight: 500;
+    }
+
+    .icon-chip-delete {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 11px;
+      padding: 2px 4px;
+      border-radius: 4px;
+      line-height: 1;
+      margin-left: 2px;
+    }
+
+    .icon-chip-delete:hover {
+      color: var(--sun-color);
+      background: #fde8e5;
+    }
+
+    .modal-footer-between {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 10px;
+      border-top: 1px solid var(--card-border);
+    }
+
+    .btn-text-danger {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 12px;
+      cursor: pointer;
+      font-family: inherit;
+      padding: 4px 6px;
+      border-radius: 6px;
+      transition: all 0.2s;
+    }
+
+    .btn-text-danger:hover {
+      color: var(--sun-color);
+      text-decoration: underline;
+    }
+
+    /* SVG共通クラス */
+    .custom-svg-icon {
+      display: inline-block;
+      vertical-align: middle;
+      flex-shrink: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    <header>
+      <div class="header-logo">
+        <span class="logo-cat-icon" id="logo-cat-slot"></span>
+        <h1 class="brand-title">Nemo Calendar</h1>
+      </div>
+      <div class="header-actions">
+        <button class="icon-manage-btn" id="open-icon-manage-btn">
+          <span>⚙️</span>
+          <span>アイコン管理</span>
+        </button>
+      </div>
+    </header>
+
+    <div class="main-content">
+      <!-- カレンダーメインセクション -->
+      <section class="calendar-section">
+        <div class="calendar-nav">
+          <div class="month-nav-group">
+            <button class="nav-btn" id="prev-btn" title="前月">‹ 前月</button>
+            <div class="month-label" id="month-label"></div>
+            <button class="nav-btn" id="next-btn" title="翌月">翌月 ›</button>
+          </div>
+          <div class="nav-controls">
+            <button class="nav-btn today-btn" id="today-btn">今日</button>
+          </div>
+        </div>
+
+        <div class="calendar-card">
+          <div class="weekdays">
+            <div>日</div><div>月</div><div>火</div><div>水</div><div>木</div><div>金</div><div>土</div>
+          </div>
+          <div class="days-grid" id="days-grid"></div>
+        </div>
+      </section>
+
+      <!-- 右サイドパネル -->
+      <aside class="side-panel">
+        <!-- 選択日の予定 -->
+        <div class="side-card">
+          <div class="side-header">
+            <div class="side-title">
+              <span>📅</span>
+              <span id="side-selected-date">予定</span>
+            </div>
+            <button class="add-btn-small" id="side-add-btn">+ 予定を追加</button>
+          </div>
+          <div class="event-list" id="side-event-list"></div>
+        </div>
+
+        <!-- よく使うアイコン -->
+        <div class="side-card">
+          <div class="side-subtitle">
+            <div class="subtitle-left">
+              <span>✨</span>
+              <span>よく使うアイコン</span>
+            </div>
+            <button class="text-link-btn" id="quick-manage-btn">編集</button>
+          </div>
+          <div class="quick-icons-grid" id="quick-icons-grid"></div>
+        </div>
+
+        <!-- 右下のイラスト（囲みなし・ナチュラル配置） -->
+        <div class="mascot-standalone">
+          <img src="cat-illustration.png" alt="Take it easy." class="mascot-img">
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <!-- 予定追加ポップアップ -->
+  <div class="modal-overlay" id="modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="modal-date-title">予定を追加</h3>
+        <button class="modal-close-icon" id="btn-modal-close-x">✕</button>
+      </div>
+      
+      <p class="modal-hint">アイコンを選択</p>
+      <div class="icon-selector" id="icon-selector"></div>
+
+      <input type="text" id="event-title" class="input-text" placeholder="予定の詳細（例: カフェ巡り、映画など）">
+
+      <div class="modal-actions">
+        <button class="btn btn-cancel" id="btn-cancel">キャンセル</button>
+        <button class="btn btn-save" id="btn-save">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- アイコン管理モーダル -->
+  <div class="modal-overlay" id="icon-manage-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>⚙️ アイコン管理</h3>
+        <button class="modal-close-icon" id="btn-close-icon-manage">✕</button>
+      </div>
+
+      <!-- 新しいアイコンを追加 -->
+      <div class="add-icon-section">
+        <div class="section-label">新しいアイコンを追加</div>
+        <div class="add-icon-form">
+          <input type="text" id="new-icon-char" class="input-char" placeholder="🐱" maxlength="4">
+          <input type="text" id="new-icon-label" class="input-label" placeholder="アイコン名 (例: 買い物)">
+          <button type="button" class="btn btn-save" id="btn-add-custom-icon">追加</button>
+        </div>
+        
+        <div class="preset-emojis">
+          <span class="preset-hint">候補から選ぶ:</span>
+          <div class="preset-emoji-list" id="preset-emoji-list"></div>
+        </div>
+      </div>
+
+      <!-- 登録中のアイコン一覧 -->
+      <div class="current-icons-section">
+        <div class="section-label">登録中のアイコン（✕で削除）</div>
+        <div class="icon-chips-container" id="manage-icon-list"></div>
+      </div>
+
+      <div class="modal-footer-between">
+        <button type="button" class="btn-text-danger" id="btn-reset-icons">初期アイコンに戻す</button>
+        <button type="button" class="btn btn-save" id="btn-done-icon-manage">完了</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // サンプルの下側にある手描き風イラストSVG辞書
+    const HAND_DRAWN_SVGS = {
+      // 1. ねこ
+      'cat': `<svg viewBox="0 0 36 36" class="custom-svg-icon" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M18 30 C10 30 6 25 6 18 C6 13 8 9 10 7 L14 11 C15.5 10.5 16.7 10.3 18 10.3 C19.3 10.3 20.5 10.5 22 11 L26 7 C28 9 30 13 30 18 C30 25 26 30 18 30 Z" fill="#fdf2ed" stroke="#7d6155" stroke-width="2" stroke-linejoin="round"/>
+        <polygon points="10.5,9 13,12 10,13" fill="#f3bebe"/>
+        <polygon points="25.5,9 23,12 26,13" fill="#f3bebe"/>
+        <path d="M22 10.5 C25 12 28 15 28 18 C26 18 24 14 22 10.5 Z" fill="#e8a898"/>
+        <path d="M12 17 Q14 14 16 17" stroke="#684d43" stroke-width="2" stroke-linecap="round"/>
+        <path d="M20 17 Q22 14 24 17" stroke="#684d43" stroke-width="2" stroke-linecap="round"/>
+        <polygon points="18,19.5 16.5,18 19.5,18" fill="#e89184"/>
+        <path d="M18 19.5 L18 21.5 Q16 23 14.5 22 M18 21.5 Q20 23 21.5 22" stroke="#684d43" stroke-width="1.8" stroke-linecap="round"/>
+        <circle cx="11.5" cy="20.5" r="2.2" fill="#f5b8ad" opacity="0.8"/>
+        <circle cx="24.5" cy="20.5" r="2.2" fill="#f5b8ad" opacity="0.8"/>
+      </svg>`,
+
+      // 2. ケーキ
+      'cake': `<svg viewBox="0 0 36 36" class="custom-svg-icon" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M8 20 C8 20 8 28 8 28 C8 29.5 12.5 31 18 31 C23.5 31 28 29.5 28 28 C28 28 28 20 28 20" fill="#fbf0e8" stroke="#be766e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M8 24.5 C12 26 24 26 28 24.5" stroke="#f0c29e" stroke-width="2.5" stroke-linecap="round"/>
+        <path d="M8 20 C8 17.5 12.5 16 18 16 C23.5 16 28 17.5 28 20 C28 22 26 22 24.5 21 C23 20 21.5 22 20 22 C18.5 22 17 20 15.5 21 C14 22 12 22 10.5 21 C9.5 20.5 8 21.5 8 20 Z" fill="#fce4de" stroke="#be766e" stroke-width="2" stroke-linejoin="round"/>
+        <line x1="13" y1="17" x2="13" y2="10" stroke="#be766e" stroke-width="2" stroke-linecap="round"/>
+        <path d="M13 9 C11.5 7.5 13 4.5 13 4.5 C13 4.5 14.5 7.5 13 9 Z" fill="#e87869"/>
+        <line x1="18" y1="16" x2="18" y2="8" stroke="#be766e" stroke-width="2" stroke-linecap="round"/>
+        <path d="M18 7 C16.5 5.5 18 2.5 18 2.5 C18 2.5 19.5 5.5 18 7 Z" fill="#e87869"/>
+        <line x1="23" y1="17" x2="23" y2="10" stroke="#be766e" stroke-width="2" stroke-linecap="round"/>
+        <path d="M23 9 C21.5 7.5 23 4.5 23 4.5 C23 4.5 24.5 7.5 23 9 Z" fill="#e87869"/>
+      </svg>`,
+
+      // 3. カフェ
+      'coffee': `<svg viewBox="0 0 36 36" class="custom-svg-icon" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="18" cy="29" rx="13" ry="2.5" fill="#e8e1da" stroke="#7d6a5f" stroke-width="2"/>
+        <path d="M24 16 C28 16 30 20 28 23 C26.5 25 24 24.5 23 24" stroke="#7d6a5f" stroke-width="2" stroke-linecap="round"/>
+        <path d="M10 14 C10 24 13 27 18 27 C23 27 26 24 26 14 Z" fill="#f7f2eb" stroke="#7d6a5f" stroke-width="2" stroke-linejoin="round"/>
+        <ellipse cx="18" cy="14" rx="7.8" ry="2.2" fill="#6d493a"/>
+        <path d="M18 5 L18 8" stroke="#d4957e" stroke-width="2" stroke-linecap="round"/>
+        <path d="M13 7 L14 9" stroke="#d4957e" stroke-width="2" stroke-linecap="round"/>
+        <path d="M23 7 L22 9" stroke="#d4957e" stroke-width="2" stroke-linecap="round"/>
+      </svg>`,
+
+      // 4. お花
+      'flower': `<svg viewBox="0 0 36 36" class="custom-svg-icon" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M18 20 L18 31" stroke="#5d8573" stroke-width="2.2" stroke-linecap="round"/>
+        <path d="M18 26 C12 26 11 22 13 20 C16 20 17.5 23 18 26 Z" fill="#7ba895" stroke="#5d8573" stroke-width="1.8" stroke-linejoin="round"/>
+        <path d="M18 26 C24 26 25 22 23 20 C20 20 18.5 23 18 26 Z" fill="#7ba895" stroke="#5d8573" stroke-width="1.8" stroke-linejoin="round"/>
+        <circle cx="18" cy="8" r="4.5" fill="#f49d91" stroke="#b86b61" stroke-width="1.8"/>
+        <circle cx="11.5" cy="12.5" r="4.5" fill="#f49d91" stroke="#b86b61" stroke-width="1.8"/>
+        <circle cx="24.5" cy="12.5" r="4.5" fill="#f49d91" stroke="#b86b61" stroke-width="1.8"/>
+        <circle cx="14" cy="19" r="4.5" fill="#f49d91" stroke="#b86b61" stroke-width="1.8"/>
+        <circle cx="22" cy="19" r="4.5" fill="#f49d91" stroke="#b86b61" stroke-width="1.8"/>
+        <circle cx="18" cy="14.5" r="4.2" fill="#fae8a8" stroke="#b86b61" stroke-width="1.8"/>
+      </svg>`,
+
+      // 5. 飛行機
+      'plane': `<svg viewBox="0 0 36 36" class="custom-svg-icon" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <g transform="translate(18,18) rotate(-35) translate(-18,-18)">
+          <path d="M18 16 L6 21 C5 21.5 5 23 6.5 22.5 L18 19 Z" fill="#9bc3de" stroke="#587d9a" stroke-width="1.8" stroke-linejoin="round"/>
+          <path d="M18 16 L30 11 C31 10.5 31 9 29.5 9.5 L18 13 Z" fill="#9bc3de" stroke="#587d9a" stroke-width="1.8" stroke-linejoin="round"/>
+          <path d="M31 16 C31 16 11 13 8 13 C5 13 4 16 4 16 C4 16 5 19 8 19 C11 19 31 16 31 16 Z" fill="#b1d4ec" stroke="#587d9a" stroke-width="2" stroke-linejoin="round"/>
+          <path d="M8 14 L4 9 C3 8 2 9 3 10.5 L6 16 Z" fill="#9bc3de" stroke="#587d9a" stroke-width="1.8" stroke-linejoin="round"/>
+          <circle cx="24" cy="16" r="1.5" fill="#ffffff"/>
+          <circle cx="19" cy="16" r="1.5" fill="#ffffff"/>
+          <circle cx="14" cy="16" r="1.5" fill="#ffffff"/>
+        </g>
+      </svg>`,
+
+      // 6. カメラ
+      'camera': `<svg viewBox="0 0 36 36" class="custom-svg-icon" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="9" y="8" width="5" height="3" rx="1.5" fill="#e8cfb8" stroke="#5c6d62" stroke-width="1.8"/>
+        <circle cx="25" cy="9.5" r="2" fill="#d99f8d" stroke="#5c6d62" stroke-width="1.5"/>
+        <rect x="6" y="10" width="24" height="18" rx="5" fill="#a4b8ab" stroke="#5c6d62" stroke-width="2"/>
+        <circle cx="18" cy="19" r="6" fill="#889e90" stroke="#5c6d62" stroke-width="2"/>
+        <circle cx="18" cy="19" r="3.5" fill="#678594"/>
+        <circle cx="16.5" cy="17.5" r="1.2" fill="#ffffff"/>
+        <rect x="9" y="13" width="3.5" height="2.5" rx="1" fill="#fdfcf9" stroke="#5c6d62" stroke-width="1.5"/>
+      </svg>`,
+
+      // 7. ギフト
+      'gift': `<svg viewBox="0 0 36 36" class="custom-svg-icon" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="8" y="16" width="20" height="13" rx="3" fill="#cfc7d6" stroke="#6b5f73" stroke-width="2"/>
+        <rect x="7" y="11" width="22" height="5.5" rx="2" fill="#ded7e5" stroke="#6b5f73" stroke-width="2"/>
+        <rect x="16" y="11" width="4" height="18" fill="#e88d7d"/>
+        <line x1="16" y1="11" x2="16" y2="29" stroke="#6b5f73" stroke-width="1.5"/>
+        <line x1="20" y1="11" x2="20" y2="29" stroke="#6b5f73" stroke-width="1.5"/>
+        <path d="M18 11 C15 7 10 7 12 11 C13 12 16 11.5 18 11 Z" fill="#f2a194" stroke="#c45d4c" stroke-width="1.8" stroke-linejoin="round"/>
+        <path d="M18 11 C21 7 26 7 24 11 C23 12 20 11.5 18 11 Z" fill="#f2a194" stroke="#c45d4c" stroke-width="1.8" stroke-linejoin="round"/>
+        <circle cx="18" cy="11" r="2" fill="#d96a57"/>
+      </svg>`,
+
+      // 8. 本
+      'book': `<svg viewBox="0 0 36 36" class="custom-svg-icon" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M18 4 C17 6 18 8 18 8 C18 8 19 6 18 4 Z" fill="#e88578"/>
+        <path d="M14 6 C13 7.5 14.5 9 14.5 9 C14.5 9 15 7.5 14 6 Z" fill="#e88578"/>
+        <path d="M22 6 C23 7.5 21.5 9 21.5 9 C21.5 9 21 7.5 22 6 Z" fill="#e88578"/>
+        <path d="M6 27 C12 25 17 26.5 18 28 C19 26.5 24 25 30 27 L30 25 C24 23 19 24.5 18 26 C17 24.5 12 23 6 25 Z" fill="#6c8ca6"/>
+        <path d="M18 26 C16 23.5 11 22 6 24 L6 13 C11 11 16 12.5 18 15 Z" fill="#faf7f2" stroke="#4a657a" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M18 26 C20 23.5 25 22 30 24 L30 13 C25 11 20 12.5 18 15 Z" fill="#ffffff" stroke="#4a657a" stroke-width="2" stroke-linejoin="round"/>
+        <line x1="9" y1="16" x2="15" y2="17" stroke="#9bb1c2" stroke-width="1.6" stroke-linecap="round"/>
+        <line x1="9" y1="19.5" x2="15" y2="20.5" stroke="#9bb1c2" stroke-width="1.6" stroke-linecap="round"/>
+        <line x1="21" y1="17" x2="27" y2="16" stroke="#9bb1c2" stroke-width="1.6" stroke-linecap="round"/>
+        <line x1="21" y1="20.5" x2="27" y2="19.5" stroke="#9bb1c2" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>`,
+
+      // 9. 肉球
+      'paw': `<svg viewBox="0 0 36 36" class="custom-svg-icon" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M18 17 C13 17 11 21 12 25 C13 28 15.5 30 18 29.5 C20.5 30 23 28 24 25 C25 21 23 17 18 17 Z" fill="#88a396" stroke="#52635a" stroke-width="2" stroke-linejoin="round"/>
+        <ellipse cx="9" cy="16.5" rx="2.8" ry="3.8" transform="rotate(-30 9 16.5)" fill="#c49b88" stroke="#52635a" stroke-width="1.8"/>
+        <ellipse cx="14" cy="11.5" rx="3" ry="4" transform="rotate(-10 14 11.5)" fill="#c49b88" stroke="#52635a" stroke-width="1.8"/>
+        <ellipse cx="22" cy="11.5" rx="3" ry="4" transform="rotate(10 22 11.5)" fill="#c49b88" stroke="#52635a" stroke-width="1.8"/>
+        <ellipse cx="27" cy="16.5" rx="2.8" ry="3.8" transform="rotate(30 27 16.5)" fill="#c49b88" stroke="#52635a" stroke-width="1.8"/>
+      </svg>`
+    };
+
+    // ヘッダーロゴの猫アイコンをセット
+    document.getElementById('logo-cat-slot').innerHTML = HAND_DRAWN_SVGS.cat;
+
+    // 絵文字からSVGへの対応表
+    const EMOJI_TO_SVG = {
+      '🐱': 'cat',
+      '🎂': 'cake',
+      '☕': 'coffee',
+      '🌷': 'flower',
+      '✈️': 'plane',
+      '📷': 'camera',
+      '🎁': 'gift',
+      '📖': 'book',
+      '🐾': 'paw'
+    };
+
+    // アイコンHTML生成関数（SVGまたは絵文字）
+    function getIconHtml(iconKey) {
+      if (HAND_DRAWN_SVGS[iconKey]) {
+        return HAND_DRAWN_SVGS[iconKey];
+      }
+      if (EMOJI_TO_SVG[iconKey] && HAND_DRAWN_SVGS[EMOJI_TO_SVG[iconKey]]) {
+        return HAND_DRAWN_SVGS[EMOJI_TO_SVG[iconKey]];
+      }
+      return `<span class="emoji-icon">${escapeHtml(iconKey)}</span>`;
+    }
+
+    // サンプルの最下部にある9つの手描き風初期アイコン
+    const DEFAULT_ICONS = [
+      { key: 'cat', label: 'ねこ' },
+      { key: 'cake', label: 'ケーキ' },
+      { key: 'coffee', label: 'カフェ' },
+      { key: 'flower', label: 'お花' },
+      { key: 'plane', label: '飛行機' },
+      { key: 'camera', label: 'カメラ' },
+      { key: 'gift', label: 'ギフト' },
+      { key: 'book', label: '本' },
+      { key: 'paw', label: '肉球' }
+    ];
+
+    // アイコン追加用のおすすめ絵文字候補
+    const PRESET_EMOJIS = ['🎬', '🍽️', '🛍️', '🏃', '🥖', '🏥', '🦷', '🚗', '🧹', '🐶', '🍦', '🎀', '🧸', '💻', '🌸', '🍷', '🎨', '🎵'];
+
+    // ユーザー保存アイコンの読み込み
+    let customIcons = JSON.parse(localStorage.getItem('nemo_custom_icons'));
+    if (!customIcons || !Array.isArray(customIcons) || customIcons.length === 0) {
+      customIcons = [...DEFAULT_ICONS];
+      localStorage.setItem('nemo_custom_icons', JSON.stringify(customIcons));
+    } else {
+      // 過去データ互換用マイグレーション（iconプロパティがあればkeyに統合）
+      customIcons = customIcons.map(item => ({
+        key: item.key || item.icon || 'cat',
+        label: item.label || '予定'
+      }));
+    }
+
+    let currentDate = new Date();
+    let selectedDateStr = formatDateKey(new Date());
+    let selectedIconKey = customIcons[0] ? customIcons[0].key : 'cat';
+
+    // ブラウザ保存から予定データを読み込み
+    let events = JSON.parse(localStorage.getItem('nemoto_events')) || {};
+
+    const monthLabel = document.getElementById('month-label');
+    const daysGrid = document.getElementById('days-grid');
+    const modal = document.getElementById('modal');
+    const modalTitle = document.getElementById('modal-date-title');
+    const eventInput = document.getElementById('event-title');
+    const sideSelectedDate = document.getElementById('side-selected-date');
+    const sideEventList = document.getElementById('side-event-list');
+    const iconSelector = document.getElementById('icon-selector');
+    const quickIconsGrid = document.getElementById('quick-icons-grid');
+    const iconManageModal = document.getElementById('icon-manage-modal');
+    const manageIconList = document.getElementById('manage-icon-list');
+    const presetEmojiList = document.getElementById('preset-emoji-list');
+    const newIconChar = document.getElementById('new-icon-char');
+    const newIconLabel = document.getElementById('new-icon-label');
+
+    // 日付キー生成関数 (YYYY-MM-DD)
+    function formatDateKey(date) {
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, '0');
+      const d = String(date.getDate()).padStart(2, '0');
+      return `${y}-${m}-${d}`;
+    }
+
+    // アイコン関連ビューをすべて更新
+    function refreshAllIconViews() {
+      // 1. 予定追加モーダル内のアイコン選択肢
+      iconSelector.innerHTML = '';
+      customIcons.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'icon-choice' + (item.key === selectedIconKey ? ' selected' : '');
+        div.setAttribute('data-key', item.key);
+        div.innerHTML = `
+          <div class="icon-choice-visual">${getIconHtml(item.key)}</div>
+          <div class="icon-choice-label">${escapeHtml(item.label)}</div>
+        `;
+        div.onclick = () => {
+          document.querySelectorAll('.icon-choice').forEach(c => c.classList.remove('selected'));
+          div.classList.add('selected');
+          selectedIconKey = item.key;
+        };
+        iconSelector.appendChild(div);
+      });
+
+      // 2. 右サイドパネルの「よく使うアイコン」
+      quickIconsGrid.innerHTML = '';
+      customIcons.forEach(item => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'quick-icon-btn';
+        btn.innerHTML = `
+          <div class="quick-icon-visual">${getIconHtml(item.key)}</div>
+          <span class="quick-icon-label">${escapeHtml(item.label)}</span>
+        `;
+        btn.onclick = () => {
+          openModalWithIcon(item.key);
+        };
+        quickIconsGrid.appendChild(btn);
+      });
+
+      // 3. アイコン管理モーダルの一覧チップ
+      manageIconList.innerHTML = '';
+      customIcons.forEach((item, idx) => {
+        const chip = document.createElement('div');
+        chip.className = 'icon-chip';
+        chip.innerHTML = `
+          <span class="icon-chip-visual">${getIconHtml(item.key)}</span>
+          <span class="icon-chip-label">${escapeHtml(item.label)}</span>
+          <button type="button" class="icon-chip-delete" title="削除">✕</button>
+        `;
+        chip.querySelector('.icon-chip-delete').onclick = () => {
+          deleteCustomIcon(idx);
+        };
+        manageIconList.appendChild(chip);
+      });
+    }
+
+    // アイコン候補プリセットの初期化
+    function initPresetEmojis() {
+      presetEmojiList.innerHTML = '';
+      PRESET_EMOJIS.forEach(emoji => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'preset-btn';
+        btn.textContent = emoji;
+        btn.onclick = () => {
+          newIconChar.value = emoji;
+          newIconLabel.focus();
+        };
+        presetEmojiList.appendChild(btn);
+      });
+    }
+
+    // 新規カスタムアイコン追加
+    function addCustomIcon() {
+      const char = newIconChar.value.trim();
+      const label = newIconLabel.value.trim();
+      if (!char) {
+        alert('絵文字または文字を入力してください');
+        newIconChar.focus();
+        return;
+      }
+      customIcons.push({
+        key: char,
+        label: label || '予定'
+      });
+      localStorage.setItem('nemo_custom_icons', JSON.stringify(customIcons));
+      newIconChar.value = '';
+      newIconLabel.value = '';
+      refreshAllIconViews();
+    }
+
+    // カスタムアイコン削除
+    function deleteCustomIcon(index) {
+      if (customIcons.length <= 1) {
+        alert('アイコンは最低1つ残してください');
+        return;
+      }
+      customIcons.splice(index, 1);
+      localStorage.setItem('nemo_custom_icons', JSON.stringify(customIcons));
+      if (!customIcons.some(item => item.key === selectedIconKey)) {
+        selectedIconKey = customIcons[0].key;
+      }
+      refreshAllIconViews();
+    }
+
+    // 初期アイコンに戻す
+    function resetCustomIcons() {
+      if (confirm('サンプルの手描き風初期アイコン9種類に戻しますか？')) {
+        customIcons = [...DEFAULT_ICONS];
+        localStorage.setItem('nemo_custom_icons', JSON.stringify(customIcons));
+        selectedIconKey = customIcons[0].key;
+        refreshAllIconViews();
+      }
+    }
+
+    // カレンダーの描画
+    function renderCalendar() {
+      const year = currentDate.getFullYear();
+      const month = currentDate.getMonth();
+
+      monthLabel.textContent = `${year}年 ${month + 1}月`;
+
+      const firstDay = new Date(year, month, 1).getDay();
+      const lastDate = new Date(year, month + 1, 0).getDate();
+      const prevLastDate = new Date(year, month, 0).getDate();
+
+      const realToday = new Date();
+      const isCurrentMonth = realToday.getFullYear() === year && realToday.getMonth() === month;
+
+      daysGrid.innerHTML = '';
+
+      // 前月の余白
+      for (let i = firstDay - 1; i >= 0; i--) {
+        const prevDay = prevLastDate - i;
+        const cell = document.createElement('div');
+        cell.className = 'day-cell other-month';
+        cell.innerHTML = `<span class="day-number">${prevDay}</span>`;
+        daysGrid.appendChild(cell);
+      }
+
+      // 当月の日付
+      for (let day = 1; day <= lastDate; day++) {
+        const cell = document.createElement('div');
+        const dayOfWeek = new Date(year, month, day).getDay();
+        const dateKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+
+        let dayClass = 'day-cell';
+        if (dayOfWeek === 0) dayClass += ' sunday';
+        if (dayOfWeek === 6) dayClass += ' saturday';
+        if (isCurrentMonth && realToday.getDate() === day) dayClass += ' today';
+        if (dateKey === selectedDateStr) dayClass += ' selected';
+        cell.className = dayClass;
+
+        let eventsHtml = '';
+        if (events[dateKey] && events[dateKey].length > 0) {
+          const displayEvents = events[dateKey].slice(0, 2);
+          displayEvents.forEach(ev => {
+            const iconKey = ev.key || ev.icon || 'cat';
+            eventsHtml += `
+              <div class="event-badge">
+                <span class="event-badge-icon">${getIconHtml(iconKey)}</span>
+                <span>${escapeHtml(ev.text || '')}</span>
+              </div>
+            `;
+          });
+          if (events[dateKey].length > 2) {
+            eventsHtml += `<div style="font-size:10px; color:var(--accent-pink); font-weight:700; margin-top:1px;">+他${events[dateKey].length - 2}件</div>`;
+          }
+        }
+
+        cell.innerHTML = `
+          <span class="day-number">${day}</span>
+          ${eventsHtml}
+        `;
+
+        cell.onclick = () => {
+          selectedDateStr = dateKey;
+          renderCalendar();
+          renderSidePanel();
+        };
+
+        cell.ondblclick = () => {
+          openModal(dateKey);
+        };
+
+        daysGrid.appendChild(cell);
+      }
+
+      renderSidePanel();
+    }
+
+    // サイドパネル（選択日の予定）の描画
+    function renderSidePanel() {
+      const parts = selectedDateStr.split('-');
+      if (parts.length === 3) {
+        const d = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+        const dayNames = ['日', '月', '火', '水', '木', '金', '土'];
+        const dayOfWeek = dayNames[d.getDay()];
+        sideSelectedDate.textContent = `${parseInt(parts[1], 10)}月${parseInt(parts[2], 10)}日(${dayOfWeek})の予定`;
+      }
+
+      sideEventList.innerHTML = '';
+      const dayEvents = events[selectedDateStr] || [];
+
+      if (dayEvents.length === 0) {
+        sideEventList.innerHTML = `
+          <div class="no-events">
+            <div>予定はまだありません ☕</div>
+            <div style="margin-top:4px; font-size:11px;">「+ 予定を追加」やアイコンから登録できます</div>
+          </div>
+        `;
+        return;
+      }
+
+      dayEvents.forEach((ev, idx) => {
+        const iconKey = ev.key || ev.icon || 'cat';
+        const item = document.createElement('div');
+        item.className = 'event-item';
+        item.innerHTML = `
+          <div class="event-item-left">
+            <span class="event-item-icon">${getIconHtml(iconKey)}</span>
+            <span class="event-item-text">${escapeHtml(ev.text || '予定')}</span>
+          </div>
+          <button class="event-item-delete" title="削除">✕</button>
+        `;
+
+        item.querySelector('.event-item-delete').onclick = (e) => {
+          e.stopPropagation();
+          deleteEvent(selectedDateStr, idx);
+        };
+
+        sideEventList.appendChild(item);
+      });
+    }
+
+    // 予定の削除
+    function deleteEvent(dateKey, index) {
+      if (!events[dateKey]) return;
+      events[dateKey].splice(index, 1);
+      if (events[dateKey].length === 0) {
+        delete events[dateKey];
+      }
+      localStorage.setItem('nemoto_events', JSON.stringify(events));
+      renderCalendar();
+      renderSidePanel();
+    }
+
+    // 予定追加モーダルを開く
+    function openModal(dateKey) {
+      selectedDateStr = dateKey;
+      const parts = dateKey.split('-');
+      modalTitle.textContent = `${parseInt(parts[1], 10)}月${parseInt(parts[2], 10)}日の予定を追加`;
+      eventInput.value = '';
+      modal.style.display = 'flex';
+      eventInput.focus();
+    }
+
+    // 特定アイコンを選択してモーダルを開く
+    function openModalWithIcon(key) {
+      selectedIconKey = key;
+      document.querySelectorAll('.icon-choice').forEach(choice => {
+        if (choice.getAttribute('data-key') === key) {
+          choice.classList.add('selected');
+        } else {
+          choice.classList.remove('selected');
+        }
+      });
+      openModal(selectedDateStr);
+    }
+
+    // HTMLエスケープ（XSS防止）
+    function escapeHtml(str) {
+      return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    // イベントリスナー設定
+    document.getElementById('btn-cancel').onclick = () => modal.style.display = 'none';
+    document.getElementById('btn-modal-close-x').onclick = () => modal.style.display = 'none';
+    document.getElementById('side-add-btn').onclick = () => openModal(selectedDateStr);
+
+    document.getElementById('btn-save').onclick = () => {
+      const text = eventInput.value.trim();
+      if (!events[selectedDateStr]) events[selectedDateStr] = [];
+      events[selectedDateStr].push({
+        key: selectedIconKey,
+        icon: selectedIconKey,
+        text: text || '予定'
+      });
+      localStorage.setItem('nemoto_events', JSON.stringify(events));
+      modal.style.display = 'none';
+      renderCalendar();
+      renderSidePanel();
+    };
+
+    eventInput.onkeydown = (e) => {
+      if (e.key === 'Enter') {
+        document.getElementById('btn-save').click();
+      }
+    };
+
+    // 月ナビゲーション
+    document.getElementById('prev-btn').onclick = () => {
+      currentDate.setDate(1);
+      currentDate.setMonth(currentDate.getMonth() - 1);
+      renderCalendar();
+    };
+
+    document.getElementById('today-btn').onclick = () => {
+      currentDate = new Date();
+      selectedDateStr = formatDateKey(currentDate);
+      renderCalendar();
+    };
+
+    document.getElementById('next-btn').onclick = () => {
+      currentDate.setDate(1);
+      currentDate.setMonth(currentDate.getMonth() + 1);
+      renderCalendar();
+    };
+
+    // アイコン管理モーダル開閉
+    document.getElementById('open-icon-manage-btn').onclick = () => {
+      iconManageModal.style.display = 'flex';
+      newIconChar.focus();
+    };
+
+    document.getElementById('quick-manage-btn').onclick = () => {
+      iconManageModal.style.display = 'flex';
+      newIconChar.focus();
+    };
+
+    document.getElementById('btn-close-icon-manage').onclick = () => {
+      iconManageModal.style.display = 'none';
+    };
+
+    document.getElementById('btn-done-icon-manage').onclick = () => {
+      iconManageModal.style.display = 'none';
+    };
+
+    document.getElementById('btn-add-custom-icon').onclick = addCustomIcon;
+    document.getElementById('btn-reset-icons').onclick = resetCustomIcons;
+
+    newIconLabel.onkeydown = (e) => {
+      if (e.key === 'Enter') {
+        addCustomIcon();
+      }
+    };
+
+    // 背景クリックでモーダルを閉じる
+    window.onclick = (e) => {
+      if (e.target === modal) modal.style.display = 'none';
+      if (e.target === iconManageModal) iconManageModal.style.display = 'none';
+    };
+
+    // 初期化実行
+    initPresetEmojis();
+    refreshAllIconViews();
+    renderCalendar();
+  </script>
+</body>
+</html>
