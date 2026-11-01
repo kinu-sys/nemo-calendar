@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import { Calendar, CalendarEvent, IconItem } from '@/types/database';
@@ -37,6 +37,8 @@ export default function CalendarAppPage() {
   const [events, setEvents] = useState<Record<string, CalendarEvent[]>>({});
   const [customIcons, setCustomIcons] = useState<IconItem[]>(DEFAULT_ICONS);
   const [loading, setLoading] = useState<boolean>(true);
+  const [calendarLoadError, setCalendarLoadError] = useState<string | null>(null);
+  const calendarInitStarted = useRef(false);
 
   // モーダル状態
   const [isEventModalOpen, setIsEventModalOpen] = useState<boolean>(false);
@@ -46,6 +48,9 @@ export default function CalendarAppPage() {
 
   // 1. 初期化: ユーザーとカレンダー一覧取得
   useEffect(() => {
+    if (calendarInitStarted.current) return;
+    calendarInitStarted.current = true;
+
     async function initUserAndCalendars() {
       setLoading(true);
       const { data: { user } } = await supabase.auth.getUser();
@@ -63,6 +68,11 @@ export default function CalendarAppPage() {
 
       if (memberErr) {
         console.error('カレンダー取得エラー:', memberErr);
+        setCalendarLoadError(`カレンダーを読み込めませんでした: ${memberErr.message}`);
+        setCalendars([]);
+        setCurrentCalendar(null);
+        setLoading(false);
+        return;
       }
 
       let calList: Calendar[] = [];
@@ -74,18 +84,35 @@ export default function CalendarAppPage() {
 
       // カレンダーが1つもない場合はデフォルトの「マイカレンダー」を作成
       if (calList.length === 0) {
-        const { data: newCal, error: createErr } = await supabase
+        const { error: createErr } = await supabase
           .from('calendars')
           .insert({
             name: 'マイカレンダー',
             description: '個人・共有の予定',
             created_by: user.id,
-          })
-          .select()
-          .single();
+          });
 
-        if (newCal && !createErr) {
-          calList = [newCal];
+        if (createErr) {
+          console.error('カレンダー作成エラー:', createErr);
+          setCalendarLoadError(`カレンダーを作成できませんでした: ${createErr.message}`);
+        }
+      }
+
+      // If the calendar was inserted, load it through the membership row
+      // created by the database trigger rather than INSERT ... RETURNING.
+      if (calList.length === 0) {
+        const { data: refreshedMembers, error: refreshErr } = await supabase
+          .from('calendar_members')
+          .select('calendar_id, calendars (*)')
+          .eq('user_id', user.id);
+
+        if (refreshErr) {
+          console.error('Calendar lookup after create failed:', refreshErr);
+          setCalendarLoadError(`作成したカレンダーを読み込めませんでした: ${refreshErr.message}`);
+        } else if (refreshedMembers) {
+          calList = refreshedMembers
+            .map((r: any) => r.calendars)
+            .filter(Boolean) as Calendar[];
         }
       }
 
@@ -192,14 +219,19 @@ export default function CalendarAppPage() {
   };
 
   // 予定の追加
-  const handleSaveEvent = async (title: string, iconKey: string) => {
-    if (!currentCalendar || !user) return;
+  const handleSaveEvent = async (dateStr: string, title: string, iconKey: string) => {
+    if (!currentCalendar) {
+      throw new Error('保存先のカレンダーが選択されていません。カレンダーを選び直してください。');
+    }
+    if (!user) {
+      throw new Error('ログイン状態を確認できません。いったんログアウトして、もう一度ログインしてください。');
+    }
 
     const { data, error } = await supabase
       .from('events')
       .insert({
         calendar_id: currentCalendar.id,
-        date: selectedDateStr,
+        date: dateStr,
         title,
         icon_key: iconKey,
         created_by: user.id,
@@ -208,18 +240,21 @@ export default function CalendarAppPage() {
       .single();
 
     if (error) {
-      alert(`予定の保存に失敗しました: ${error.message}`);
-      return;
+      console.error('予定の保存エラー:', error);
+      throw new Error(error.message);
     }
 
     if (data) {
       setEvents((prev) => {
         const next = { ...prev };
-        if (!next[selectedDateStr]) next[selectedDateStr] = [];
-        next[selectedDateStr] = [...next[selectedDateStr], data];
+        if (!next[dateStr]) next[dateStr] = [];
+        next[dateStr] = [...next[dateStr], data];
         return next;
       });
+      return;
     }
+
+    throw new Error('保存結果を確認できませんでした。画面を更新して予定一覧を確認してください。');
   };
 
   // 予定の削除
@@ -336,6 +371,18 @@ export default function CalendarAppPage() {
     );
   }
 
+  if (calendarLoadError) {
+    return (
+      <div className="app-container flex min-h-[60vh] items-center justify-center p-6">
+        <div className="max-w-xl rounded-2xl border border-red-200 bg-red-50 p-5 text-sm text-red-700">
+          <p className="font-bold">カレンダーを開けませんでした</p>
+          <p className="mt-2 break-words">{calendarLoadError}</p>
+          <p className="mt-3 text-red-600">管理者にSupabaseのカレンダー権限設定を確認してもらってください。</p>
+        </div>
+      </div>
+    );
+  }
+
   const selectedDayEvents = events[selectedDateStr] || [];
 
   return (
@@ -372,7 +419,7 @@ export default function CalendarAppPage() {
         <SidePanel
           selectedDateStr={selectedDateStr}
           dayEvents={selectedDayEvents}
-          quickIcons={customIcons.slice(0, 9)}
+          quickIcons={customIcons}
           onOpenAddModal={(iconKey) => {
             setEventModalIconKey(iconKey);
             setIsEventModalOpen(true);

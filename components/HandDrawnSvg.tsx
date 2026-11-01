@@ -7,6 +7,27 @@ interface HandDrawnSvgProps {
 }
 
 export const HandDrawnSvg: React.FC<HandDrawnSvgProps> = ({ iconKey, className = "w-5 h-5 inline-block" }) => {
+  const legacyImageKeys: Record<string, string> = {
+    '08_食事.svg': '08_食事.png',
+    '10_ヨガ.png': '10_リハビリ.png',
+    '12_会話.png': '12_打合せ.png',
+    '12_会話.svg': '12_打合せ.png',
+    '14_打ち合わせ.png': '14_会議.png',
+    '20_ビール.svg': '20_ビール.png',
+    '27_買い物.png': 'パステルカラーのショッピングバッグ.png',
+    '33_病気.svg': '33_病気.png',
+  };
+  const imageKey = legacyImageKeys[iconKey] || iconKey;
+  if (/\.(png|svg)$/i.test(imageKey)) {
+    const isCompact = className.split(/\s+/).some((name) => name === 'w-3.5' || name === 'w-4');
+    const scaleClass = isCompact
+      ? ''
+      : imageKey === '14_会議.png'
+        ? 'scale-[1.4]'
+        : '';
+    const assetVersion = imageKey === '20_ビール.png' ? '?v=2' : '';
+    return <img src={`/icons/${encodeURIComponent(imageKey)}${assetVersion}`} alt="" className={`${className} object-contain ${scaleClass}`} />;
+  }
   // 絵文字が渡された場合はSVGマッピングを確認
   const resolvedKey = EMOJI_TO_SVG[iconKey] || iconKey;
 
@@ -14,16 +35,36 @@ export const HandDrawnSvg: React.FC<HandDrawnSvgProps> = ({ iconKey, className =
     case 'cat':
       return (
         <svg viewBox="0 0 36 36" className={className} fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M18 30 C10 30 6 25 6 18 C6 13 8 9 10 7 L14 11 C15.5 10.5 16.7 10.3 18 10.3 C19.3 10.3 20.5 10.5 22 11 L26 7 C28 9 30 13 30 18 C30 25 26 30 18 30 Z" fill="#fdf2ed" stroke="#7d6155" strokeWidth="2" strokeLinejoin="round"/>
-          <polygon points="10.5,9 13,12 10,13" fill="#f3bebe"/>
-          <polygon points="25.5,9 23,12 26,13" fill="#f3bebe"/>
-          <path d="M22 10.5 C25 12 28 15 28 18 C26 18 24 14 22 10.5 Z" fill="#e8a898"/>
-          <path d="M12 17 Q14 14 16 17" stroke="#684d43" strokeWidth="2" strokeLinecap="round"/>
-          <path d="M20 17 Q22 14 24 17" stroke="#684d43" strokeWidth="2" strokeLinecap="round"/>
-          <polygon points="18,19.5 16.5,18 19.5,18" fill="#e89184"/>
-          <path d="M18 19.5 L18 21.5 Q16 23 14.5 22 M18 21.5 Q20 23 21.5 22" stroke="#684d43" strokeWidth="1.8" strokeLinecap="round"/>
-          <circle cx="11.5" cy="20.5" r="2.2" fill="#f5b8ad" opacity="0.8"/>
-          <circle cx="24.5" cy="20.5" r="2.2" fill="#f5b8ad" opacity="0.8"/>
+          <defs>
+            <linearGradient id="cat-fur" x1="8" y1="5" x2="27" y2="32" gradientUnits="userSpaceOnUse">
+              <stop stopColor="#fffdf8" />
+              <stop offset="1" stopColor="#f0d9c7" />
+            </linearGradient>
+            <linearGradient id="cat-ear" x1="10" y1="7" x2="15" y2="15" gradientUnits="userSpaceOnUse">
+              <stop stopColor="#f8c7bd" />
+              <stop offset="1" stopColor="#e99b91" />
+            </linearGradient>
+            <radialGradient id="cat-eye" cx="0" cy="0" r="1" gradientTransform="matrix(0 3.2 -2.4 0 13.5 19.3)" gradientUnits="userSpaceOnUse">
+              <stop stopColor="#738b78" />
+              <stop offset="1" stopColor="#435449" />
+            </radialGradient>
+            <filter id="cat-shadow" x="2" y="2" width="32" height="34" filterUnits="userSpaceOnUse">
+              <feGaussianBlur stdDeviation="1" />
+            </filter>
+          </defs>
+          <ellipse cx="18" cy="31.2" rx="11.2" ry="1.7" fill="#8f6d5e" opacity=".16" filter="url(#cat-shadow)" />
+          <path d="M7.3 14.6 6.8 5.9c-.1-1.5 1-2.2 2.2-1.1l6.3 5.5a13 13 0 0 1 5.4 0L27 4.8c1.2-1.1 2.3-.4 2.2 1.1l-.5 8.7c1.3 2 2 4.3 2 6.8 0 6.6-5 10.7-12.7 10.7S5.3 28 5.3 21.4c0-2.5.7-4.8 2-6.8Z" fill="#704f40" />
+          <path d="M8.9 14.9 8.4 6.7l6.4 5.6c-2.6.4-4.6 1.3-5.9 2.6Zm18.2 0 .5-8.2-6.4 5.6c2.6.4 4.6 1.3 5.9 2.6Z" fill="url(#cat-ear)" />
+          <path d="M8.2 15.2c1.5-2 4-3.2 7.5-3.5a12.8 12.8 0 0 1 4.6 0c3.5.3 6 1.5 7.5 3.5 1.1 1.6 1.7 3.7 1.7 6.1 0 5.4-4.3 8.7-11.5 8.7S6.5 26.7 6.5 21.3c0-2.4.6-4.5 1.7-6.1Z" fill="url(#cat-fur)" />
+          <path d="M10.3 18.9c.7-1.1 1.8-1.7 3.2-1.7s2.5.6 3.2 1.7c-.7 1.1-1.8 1.7-3.2 1.7s-2.5-.6-3.2-1.7Zm9 0c.7-1.1 1.8-1.7 3.2-1.7s2.5.6 3.2 1.7c-.7 1.1-1.8 1.7-3.2 1.7s-2.5-.6-3.2-1.7Z" fill="url(#cat-eye)" />
+          <circle cx="12.6" cy="18.3" r=".8" fill="white" />
+          <circle cx="21.6" cy="18.3" r=".8" fill="white" />
+          <path d="M18 20.9c-.5-.5-1.4-.1-1.4.6 0 .8 1.4 1.7 1.4 1.7s1.4-.9 1.4-1.7c0-.7-.9-1.1-1.4-.6Z" fill="#d98078" />
+          <path d="M18 23.1c-.2 1-1 1.6-2 1.6m2-1.6c.2 1 1 1.6 2 1.6" stroke="#704f40" strokeWidth="1.1" strokeLinecap="round" />
+          <ellipse cx="10.8" cy="22" rx="2.1" ry="1.15" fill="#efaaa2" opacity=".82" />
+          <ellipse cx="25.2" cy="22" rx="2.1" ry="1.15" fill="#efaaa2" opacity=".82" />
+          <path d="m6.7 21.5 4.1.5m-4 1.7 4-.1m19.5-2.1-4.1.5m4 1.7-4-.1" stroke="#9c7969" strokeWidth=".7" strokeLinecap="round" opacity=".75" />
+          <path d="m17.7 5.1.5 1 .9.3-.9.4-.5 1-.4-1-.9-.4.9-.3.4-1Z" fill="#e6bb65" />
         </svg>
       );
     case 'cake':

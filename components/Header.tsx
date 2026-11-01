@@ -1,8 +1,8 @@
 'use client';
 
 import React from 'react';
-import { HandDrawnSvg } from './HandDrawnSvg';
 import { Calendar } from '@/types/database';
+import Image from 'next/image';
 import { Settings, Users, LogOut, Share2 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
@@ -41,24 +41,34 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   return (
-    <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-5 px-1">
-      {/* ロゴ & カレンダー選択 */}
-      <div className="flex flex-wrap items-center gap-3">
-        <div className="flex items-center gap-2.5">
-          <span className="w-11 h-11 bg-white border border-card-border rounded-full flex items-center justify-center shadow-subtle">
-            <HandDrawnSvg iconKey="cat" className="w-7 h-7" />
-          </span>
-          <h1 className="font-quicksand font-bold text-2xl tracking-wide text-pink-accent">
-            Nemo Calendar
-          </h1>
+    <header className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_310px] gap-4 md:gap-5 mb-5 px-1">
+      <div className="min-w-0">
+        <div className="flex items-center justify-between min-h-[135px] gap-3">
+          {/* 左端の猫イラスト */}
+          <Image
+            src="/title-cat.png?v=2"
+            alt=""
+            width={135}
+            height={135}
+            className="w-[135px] h-[135px] object-contain flex-shrink-0"
+          />
+
+          {/* カレンダー領域の右端にタイトル */}
+          <Image
+            src="/leaf-logo.png"
+            alt="Nemo Calendar"
+            width={300}
+            height={99}
+            className="w-[300px] max-w-[calc(100vw_-_180px)] h-auto object-contain flex-shrink-0"
+          />
         </div>
 
         {/* カレンダー切り替えセレクター */}
         {currentCalendar && (
-          <div className="flex items-center gap-1.5 ml-1 sm:ml-4 bg-white border border-card-border px-3 py-1.5 rounded-2xl shadow-subtle text-xs font-bold text-text-main">
-            <Users className="w-3.5 h-3.5 text-pink-accent" />
+          <div className="hidden inline-flex items-center gap-1.5 bg-white border border-card-border px-3 py-1.5 rounded-2xl shadow-subtle text-xs font-bold text-text-main">
+            <Users className="hidden w-3.5 h-3.5 text-pink-accent" />
             <select
-              className="bg-transparent outline-none cursor-pointer pr-1"
+              className="hidden bg-transparent outline-none cursor-pointer pr-1"
               value={currentCalendar.id}
               onChange={(e) => {
                 const found = calendars.find((c) => c.id === e.target.value);
@@ -83,7 +93,7 @@ export const Header: React.FC<HeaderProps> = ({
       </div>
 
       {/* アクションボタン群 */}
-      <div className="flex items-center flex-wrap gap-2 w-full sm:w-auto justify-end">
+      <div className="flex items-center flex-wrap gap-2 justify-end md:content-start">
         {currentCalendar && (
           <button
             onClick={copyInviteCode}
@@ -92,6 +102,17 @@ export const Header: React.FC<HeaderProps> = ({
           >
             <Share2 className="w-3.5 h-3.5 text-pink-accent" />
             <span>招待: {currentCalendar.invite_code}</span>
+          </button>
+        )}
+
+        {currentCalendar && (
+          <button
+            onClick={onOpenCalendarManager}
+            className="bg-white hover:bg-pink-soft border border-card-border hover:border-pink-border text-text-main hover:text-pink-accent px-3 py-1.5 rounded-full text-xs font-bold transition-all shadow-subtle flex items-center gap-1.5"
+            title="カレンダーの参加者を確認"
+          >
+            <Users className="w-3.5 h-3.5 text-pink-accent" />
+            <span>参加者</span>
           </button>
         )}
 

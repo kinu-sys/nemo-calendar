@@ -12,6 +12,15 @@ export async function GET(request: Request) {
     if (!error) {
       return NextResponse.redirect(`${origin}${next}`);
     }
+
+    console.error('Google OAuth callback failed:', {
+      code: error.code,
+      message: error.message,
+    });
+    const reason = error.message || error.code || 'unknown';
+    return NextResponse.redirect(
+      `${origin}/login?error=auth-failed&reason=${encodeURIComponent(reason)}`
+    );
   }
 
   return NextResponse.redirect(`${origin}/login?error=auth-failed`);

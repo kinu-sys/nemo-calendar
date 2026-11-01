@@ -11,7 +11,7 @@ interface EventModalProps {
   initialIconKey?: string;
   icons: IconItem[];
   onClose: () => void;
-  onSave: (title: string, iconKey: string) => Promise<void>;
+  onSave: (dateStr: string, title: string, iconKey: string) => Promise<void>;
 }
 
 export const EventModal: React.FC<EventModalProps> = ({
@@ -42,10 +42,12 @@ export const EventModal: React.FC<EventModalProps> = ({
   const handleSave = async () => {
     setSaving(true);
     try {
-      await onSave(title.trim() || '予定', selectedKey);
+      await onSave(dateStr, title.trim() || '予定', selectedKey);
       onClose();
     } catch (e) {
       console.error(e);
+      const reason = e instanceof Error ? e.message : '原因を確認できませんでした。';
+      alert(`予定を保存できませんでした。入力内容は消えていません。\n\n理由: ${reason}`);
     } finally {
       setSaving(false);
     }
@@ -80,7 +82,7 @@ export const EventModal: React.FC<EventModalProps> = ({
 
         {/* アイコン選択 */}
         <p className="text-xs font-bold text-text-muted mb-2">アイコンを選択</p>
-        <div className="grid grid-cols-4 gap-2 mb-4 max-h-[190px] overflow-y-auto p-1">
+        <div className="grid grid-cols-5 gap-1.5 mb-4 max-h-[260px] overflow-y-auto overscroll-contain p-1">
           {icons.map((item) => {
             const isSelected = item.key === selectedKey;
             return (
@@ -88,22 +90,18 @@ export const EventModal: React.FC<EventModalProps> = ({
                 key={item.key}
                 type="button"
                 onClick={() => setSelectedKey(item.key)}
-                className={`p-2 rounded-2xl border text-center flex flex-col items-center gap-1 transition-all ${
+                title={item.label}
+                aria-label={item.label}
+                aria-pressed={isSelected}
+                className={`aspect-square rounded-2xl border p-1 flex items-center justify-center transition-all ${
                   isSelected
-                    ? 'border-pink-accent bg-pink-soft shadow-subtle -translate-y-0.5'
-                    : 'border-card-border bg-bg-soft hover:bg-pink-soft/50'
+                    ? 'border-pink-accent bg-pink-soft shadow-subtle'
+                    : 'border-transparent bg-bg-soft hover:border-pink-border hover:bg-pink-soft/50'
                 }`}
               >
-                <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-subtle">
-                  <HandDrawnSvg iconKey={item.key} className="w-5 h-5" />
+                <div className="w-full h-full flex items-center justify-center">
+                  <HandDrawnSvg iconKey={item.key} className="w-full h-full" />
                 </div>
-                <span
-                  className={`text-[10px] truncate max-w-full font-medium ${
-                    isSelected ? 'text-pink-accent font-bold' : 'text-text-muted'
-                  }`}
-                >
-                  {item.label}
-                </span>
               </button>
             );
           })}

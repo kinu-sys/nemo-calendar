@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Calendar } from '@/types/database';
 import { X, Users, Plus, KeyRound, Copy, Check } from 'lucide-react';
+import { createClient } from '@/lib/supabase/client';
 
 interface CalendarManagerModalProps {
   isOpen: boolean;
@@ -30,6 +31,67 @@ export const CalendarManagerModal: React.FC<CalendarManagerModalProps> = ({
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [members, setMembers] = useState<Array<{
+    user_id: string;
+    role: 'owner' | 'member';
+    display_name: string | null;
+    email: string | null;
+  }>>([]);
+  const [membersLoading, setMembersLoading] = useState(false);
+  const [membersError, setMembersError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!isOpen || !currentCalendar) return;
+
+    let cancelled = false;
+    const supabase = createClient();
+
+    async function loadMembers() {
+      setMembersLoading(true);
+      setMembersError(null);
+
+      const { data: memberRows, error: memberError } = await supabase
+        .from('calendar_members')
+        .select('user_id, role, joined_at')
+        .eq('calendar_id', currentCalendar.id)
+        .order('joined_at', { ascending: true });
+
+      if (memberError) {
+        if (!cancelled) setMembersError(memberError.message);
+        setMembersLoading(false);
+        return;
+      }
+
+      const userIds = (memberRows || []).map((member) => member.user_id);
+      const { data: profiles, error: profileError } = userIds.length
+        ? await supabase
+            .from('profiles')
+            .select('id, display_name, email')
+            .in('id', userIds)
+        : { data: [], error: null };
+
+      if (cancelled) return;
+      if (profileError) setMembersError(profileError.message);
+
+      const profileById = new Map(
+        (profiles || []).map((profile) => [profile.id, profile]),
+      );
+      setMembers(
+        (memberRows || []).map((member) => ({
+          user_id: member.user_id,
+          role: member.role as 'owner' | 'member',
+          display_name: profileById.get(member.user_id)?.display_name ?? null,
+          email: profileById.get(member.user_id)?.email ?? null,
+        })),
+      );
+      setMembersLoading(false);
+    }
+
+    loadMembers();
+    return () => {
+      cancelled = true;
+    };
+  }, [isOpen, currentCalendar?.id]);
 
   if (!isOpen) return null;
 
@@ -133,7 +195,7 @@ export const CalendarManagerModal: React.FC<CalendarManagerModalProps> = ({
               setTab('create');
               setErrorMsg(null);
             }}
-            className={`flex-1 py-2 border-b-2 transition-all ${
+            className={`hidden flex-1 py-2 border-b-2 transition-all ${
               tab === 'create'
                 ? 'border-pink-accent text-pink-accent'
                 : 'border-transparent text-text-muted hover:text-text-main'
@@ -208,6 +270,41 @@ export const CalendarManagerModal: React.FC<CalendarManagerModalProps> = ({
         )}
 
         {/* 招待コードで参加 */}
+        {tab === 'list' && currentCalendar && (
+          <section className="mb-4 border-t border-card-border pt-4">
+            <div className="mb-2 flex items-center gap-2 text-sm font-bold text-text-main">
+              <Users className="h-4 w-4 text-pink-accent" />
+              <span>参加者</span>
+              {!membersLoading && <span className="text-xs text-text-muted">({members.length}人)</span>}
+            </div>
+            {membersLoading ? (
+              <p className="text-xs text-text-muted">参加者を読み込み中...</p>
+            ) : membersError ? (
+              <p className="text-xs text-red-600">参加者を読み込めませんでした: {membersError}</p>
+            ) : members.length === 0 ? (
+              <p className="text-xs text-text-muted">参加者はいません。</p>
+            ) : (
+              <ul className="space-y-2">
+                {members.map((member) => (
+                  <li key={member.user_id} className="flex items-center justify-between rounded-xl bg-bg-soft px-3 py-2">
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-medium text-text-main">
+                        {member.display_name || member.email || '参加者'}
+                      </p>
+                      {member.display_name && member.email && (
+                        <p className="truncate text-xs text-text-muted">{member.email}</p>
+                      )}
+                    </div>
+                    <span className="ml-3 flex-shrink-0 rounded-full bg-white px-2 py-1 text-[10px] font-bold text-text-muted">
+                      {member.role === 'owner' ? 'オーナー' : 'メンバー'}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+        )}
+
         {tab === 'join' && (
           <div className="space-y-4 mb-4">
             <div>

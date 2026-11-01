@@ -70,7 +70,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
             <ChevronLeft className="w-3.5 h-3.5" />
             <span>前月</span>
           </button>
-          <div className="text-xl font-bold text-text-main tracking-wider px-1">
+          <div className="text-[40px] leading-none font-bold text-text-main tracking-wider px-1">
             {year}年 {month + 1}月
           </div>
           <button
@@ -95,14 +95,14 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
       {/* カレンダー本体 */}
       <div className="bg-white rounded-3xl border border-card-border shadow-soft overflow-hidden">
         {/* 曜日ヘッダー */}
-        <div className="grid grid-cols-7 bg-[#faf4f3] border-b border-card-border text-center text-xs py-2.5 font-bold text-weekday">
+        <div className="grid grid-cols-7 bg-[#e8eee5] border-b border-card-border text-center text-[16px] py-2.5 font-bold text-weekday">
           <div className="text-sun">日</div>
           <div>月</div>
           <div>火</div>
           <div>水</div>
           <div>木</div>
           <div>金</div>
-          <div className="text-sat">土</div>
+          <div className="text-[#b77c71]">土</div>
         </div>
 
         {/* 日付グリッド */}
@@ -113,7 +113,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
               key={`prev-${i}`}
               className="min-h-[92px] border-r border-b border-[#f7edea] p-1.5 bg-[#faf7f6] opacity-60 last:border-r-0"
             >
-              <span className="text-xs font-bold text-text-light">{prevDay}</span>
+              <span className="font-quicksand tabular-nums text-[16px] font-bold text-text-light">{prevDay}</span>
             </div>
           ))}
 
@@ -126,7 +126,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                 key={item.dateKey}
                 onClick={() => onSelectDate(item.dateKey)}
                 onDoubleClick={() => onOpenAddModal(item.dateKey)}
-                className={`min-h-[92px] border-b border-[#f7edea] p-1.5 cursor-pointer transition-all flex flex-col relative select-none ${
+                className={`min-h-[92px] border-b border-[#f7edea] p-0.5 cursor-pointer transition-all flex flex-col relative select-none ${
                   !isRightEdge ? 'border-r border-[#f7edea]' : ''
                 } ${
                   item.isSelected
@@ -136,11 +136,11 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                     : 'hover:bg-[#fdf7f5]'
                 }`}
               >
-                <div className="flex items-center justify-between mb-1">
+                <div className="flex items-center justify-between mb-0">
                   <span
-                    className={`text-xs font-bold inline-flex items-center justify-center ${
+                    className={`font-quicksand tabular-nums text-[16px] font-bold inline-flex items-center justify-center ${
                       item.isToday
-                        ? 'w-5 h-5 bg-pink-accent text-white rounded-full shadow-pink'
+                        ? 'w-7 h-7 bg-pink-accent text-white rounded-full shadow-pink'
                         : item.dayOfWeek === 0
                         ? 'text-sun'
                         : item.dayOfWeek === 6
@@ -150,24 +150,33 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                   >
                     {item.day}
                   </span>
+                  {item.dayEvents[0] && (
+                    <span
+                      role="img"
+                      aria-label={item.dayEvents[0].title || '予定'}
+                      className="flex h-8 w-8 items-center justify-center md:h-9 md:w-9"
+                    >
+                      <HandDrawnSvg iconKey={item.dayEvents[0].icon_key} className="h-8 w-8 md:h-9 md:w-9" />
+                    </span>
+                  )}
                 </div>
 
                 {/* 予定バッジ */}
-                <div className="space-y-1 overflow-hidden">
-                  {item.dayEvents.slice(0, 2).map((ev) => (
+                <div className="grid grid-cols-2 justify-items-start content-start gap-0 overflow-hidden">
+                  {item.dayEvents.slice(1, 3).map((ev) => (
                     <div
                       key={ev.id}
-                      className="flex items-center gap-1 bg-pink-badge border border-pink-border rounded-lg px-1.5 py-0.5 text-[11px] font-medium text-text-main truncate transition-transform hover:scale-[1.02]"
+                      className="flex h-8 w-8 flex-shrink-0 items-center justify-start md:h-9 md:w-9 [&>span:last-child]:hidden"
                     >
                       <span className="flex-shrink-0 flex items-center justify-center">
-                        <HandDrawnSvg iconKey={ev.icon_key} className="w-3.5 h-3.5" />
+                        <HandDrawnSvg iconKey={ev.icon_key} className="h-8 w-8 md:h-9 md:w-9" />
                       </span>
                       <span className="truncate">{ev.title || '予定'}</span>
                     </div>
                   ))}
 
                   {item.dayEvents.length > 2 && (
-                    <div className="text-[10px] text-pink-accent font-bold px-1">
+                    <div className="hidden text-[10px] text-pink-accent font-bold px-1">
                       +他{item.dayEvents.length - 2}件
                     </div>
                   )}

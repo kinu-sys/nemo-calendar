@@ -3,7 +3,6 @@
 import React, { useState } from 'react';
 import { IconItem } from '@/types/database';
 import { HandDrawnSvg } from './HandDrawnSvg';
-import { PRESET_EMOJIS } from '@/lib/constants';
 import { X, Sparkles } from 'lucide-react';
 
 interface IconManageModalProps {
@@ -47,7 +46,7 @@ export const IconManageModal: React.FC<IconManageModalProps> = ({
   };
 
   const handleReset = async () => {
-    if (confirm('手描き風初期アイコン9種類に戻しますか？')) {
+    if (confirm('初期アイコン33種類に戻しますか？')) {
       await onResetIcons();
     }
   };
@@ -76,14 +75,21 @@ export const IconManageModal: React.FC<IconManageModalProps> = ({
         <div className="bg-bg-soft border border-card-border rounded-2xl p-3.5 mb-4">
           <div className="text-xs font-bold text-text-main mb-2">新しいアイコンを追加</div>
           <div className="flex gap-2 items-center mb-2">
-            <input
-              type="text"
-              maxLength={4}
-              value={char}
-              onChange={(e) => setChar(e.target.value)}
-              placeholder="🐱"
-              className="w-14 text-center py-2 text-lg bg-white border border-card-border rounded-xl outline-none focus:border-pink-accent"
-            />
+            <div className="relative w-14 flex-shrink-0">
+              <input
+                type="text"
+                maxLength={4}
+                value={char}
+                onChange={(e) => setChar(e.target.value)}
+                aria-label="追加するアイコンの絵文字または文字"
+                className="w-full text-center py-2 text-lg bg-white border border-card-border rounded-xl outline-none focus:border-pink-accent"
+              />
+              {!char && (
+                <span className="pointer-events-none absolute inset-0 flex items-center justify-center">
+                  <HandDrawnSvg iconKey="cat" className="w-8 h-8" />
+                </span>
+              )}
+            </div>
             <input
               type="text"
               value={label}
@@ -107,22 +113,6 @@ export const IconManageModal: React.FC<IconManageModalProps> = ({
             </button>
           </div>
 
-          {/* プリセット絵文字 */}
-          <div className="flex items-center gap-1.5 flex-wrap mt-2">
-            <span className="text-[11px] text-text-muted font-medium">候補から選ぶ:</span>
-            <div className="flex gap-1 flex-wrap">
-              {PRESET_EMOJIS.map((emoji) => (
-                <button
-                  key={emoji}
-                  type="button"
-                  onClick={() => setChar(emoji)}
-                  className="bg-white hover:bg-pink-soft border border-card-border rounded-md px-1.5 py-0.5 text-xs transition-transform hover:scale-110"
-                >
-                  {emoji}
-                </button>
-              ))}
-            </div>
-          </div>
         </div>
 
         {/* 登録中のアイコン一覧 */}
@@ -130,19 +120,20 @@ export const IconManageModal: React.FC<IconManageModalProps> = ({
           <div className="text-xs font-bold text-text-main mb-2">
             登録中のアイコン（✕で削除）
           </div>
-          <div className="flex flex-wrap gap-1.5 max-h-[140px] overflow-y-auto p-2 bg-bg-soft rounded-2xl border border-card-border">
+          <div className="flex flex-wrap gap-2 max-h-[180px] overflow-y-auto p-2 bg-bg-soft rounded-2xl border border-card-border">
             {icons.map((item) => (
               <div
                 key={item.key}
-                className="inline-flex items-center gap-1.5 bg-white border border-card-border rounded-xl px-2.5 py-1 text-xs text-text-main shadow-subtle"
+                title={item.label}
+                className="inline-flex items-center justify-center gap-1 bg-white border border-card-border rounded-xl p-1 shadow-subtle"
               >
-                <HandDrawnSvg iconKey={item.key} className="w-4 h-4" />
-                <span className="font-medium text-[11px]">{item.label}</span>
+                <HandDrawnSvg iconKey={item.key} className="w-8 h-8" />
                 <button
                   type="button"
                   onClick={() => onDeleteIcon(item)}
                   className="text-text-muted hover:text-sun hover:bg-red-50 rounded px-1 transition-colors"
                   title="削除"
+                  aria-label={`${item.label}を削除`}
                 >
                   ✕
                 </button>

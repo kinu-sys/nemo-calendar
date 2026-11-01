@@ -3,7 +3,6 @@
 import React from 'react';
 import { CalendarEvent, IconItem } from '@/types/database';
 import { HandDrawnSvg } from './HandDrawnSvg';
-import Image from 'next/image';
 import { Plus, Trash2, CalendarDays, Sparkles } from 'lucide-react';
 
 interface SidePanelProps {
@@ -86,11 +85,11 @@ export const SidePanel: React.FC<SidePanelProps> = ({
       </div>
 
       {/* よく使うアイコン */}
-      <div className="bg-white rounded-3xl border border-card-border shadow-soft p-4">
-        <div className="flex justify-between items-center mb-3">
+      <div className="bg-white rounded-3xl border border-card-border shadow-soft p-3">
+        <div className="flex justify-between items-center mb-2">
           <div className="flex items-center gap-1 text-xs font-bold text-text-muted">
             <Sparkles className="w-3.5 h-3.5 text-pink-accent" />
-            <span>よく使うアイコン</span>
+            <span>登録アイコン</span>
           </div>
           <button
             onClick={onOpenIconManager}
@@ -100,35 +99,21 @@ export const SidePanel: React.FC<SidePanelProps> = ({
           </button>
         </div>
 
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-5 auto-rows-[52px] gap-1.5 h-[226px] overflow-y-auto overscroll-contain pr-1">
           {quickIcons.map((item) => (
             <button
               key={item.key}
               onClick={() => onOpenAddModal(item.key)}
-              className="bg-bg-soft hover:bg-pink-soft border border-card-border hover:border-pink-border rounded-2xl p-2 flex flex-col items-center gap-1 transition-all hover:-translate-y-0.5 hover:shadow-subtle group"
+              className="aspect-square bg-bg-soft hover:bg-pink-soft border border-card-border hover:border-pink-border rounded-2xl p-1 flex items-center justify-center transition-all hover:-translate-y-0.5 hover:shadow-subtle group"
             >
-              <div className="w-7 h-7 bg-white rounded-full flex items-center justify-center shadow-subtle group-hover:scale-105 transition-transform">
-                <HandDrawnSvg iconKey={item.key} className="w-4 h-4" />
+              <div className="w-full max-w-[76px] aspect-square flex items-center justify-center group-hover:scale-105 transition-transform">
+                <HandDrawnSvg iconKey={item.key} className="w-full h-full" />
               </div>
-              <span className="text-[10px] font-medium text-text-muted group-hover:text-text-main truncate max-w-full">
-                {item.label}
-              </span>
             </button>
           ))}
         </div>
       </div>
 
-      {/* 右下のイラスト */}
-      <div className="text-center py-2 flex flex-col items-center">
-        <Image
-          src="/cat-illustration.png"
-          alt="Take it easy."
-          width={130}
-          height={90}
-          className="transition-transform hover:-translate-y-1 hover:scale-105 filter drop-shadow-[0_4px_10px_rgba(215,175,168,0.15)]"
-        />
-        <span className="text-[11px] text-text-muted mt-1 font-medium">Take it easy.</span>
-      </div>
     </aside>
   );
 };
