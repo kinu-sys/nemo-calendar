@@ -43,6 +43,7 @@ export const CalendarManagerModal: React.FC<CalendarManagerModalProps> = ({
   useEffect(() => {
     if (!isOpen || !currentCalendar) return;
 
+    const calendarId = currentCalendar.id;
     let cancelled = false;
     const supabase = createClient();
 
@@ -53,7 +54,7 @@ export const CalendarManagerModal: React.FC<CalendarManagerModalProps> = ({
       const { data: memberRows, error: memberError } = await supabase
         .from('calendar_members')
         .select('user_id, role, joined_at')
-        .eq('calendar_id', currentCalendar.id)
+        .eq('calendar_id', calendarId)
         .order('joined_at', { ascending: true });
 
       if (memberError) {
