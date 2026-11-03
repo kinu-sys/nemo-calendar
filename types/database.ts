@@ -29,6 +29,10 @@ export interface CalendarEvent {
   date: string; // 'YYYY-MM-DD'
   title: string;
   icon_key: string;
+  start_time: string | null;
+  end_time: string | null;
+  location: string | null;
+  memo: string | null;
   created_by: string | null;
   created_at: string;
   updated_at: string;

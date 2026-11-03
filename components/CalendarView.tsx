@@ -10,6 +10,7 @@ interface CalendarViewProps {
   selectedDateStr: string;
   events: Record<string, CalendarEvent[]>;
   onSelectDate: (dateStr: string) => void;
+  onSelectEvent: (event: CalendarEvent) => void;
   onOpenAddModal: (dateStr: string) => void;
   onPrevMonth: () => void;
   onNextMonth: () => void;
@@ -21,6 +22,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
   selectedDateStr,
   events,
   onSelectDate,
+  onSelectEvent,
   onOpenAddModal,
   onPrevMonth,
   onNextMonth,
@@ -151,28 +153,32 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                     {item.day}
                   </span>
                   {item.dayEvents[0] && (
-                    <span
-                      role="img"
-                      aria-label={item.dayEvents[0].title || '予定'}
-                      className="flex h-8 w-8 items-center justify-center md:h-9 md:w-9"
+                    <button
+                      type="button"
+                      onClick={(e) => { e.stopPropagation(); onSelectEvent(item.dayEvents[0]); }}
+                      aria-label={`${item.dayEvents[0].title || '予定'}の詳細を表示`}
+                      className="flex h-8 w-8 items-center justify-center rounded-lg hover:bg-pink-soft md:h-9 md:w-9"
                     >
                       <HandDrawnSvg iconKey={item.dayEvents[0].icon_key} className="h-8 w-8 md:h-9 md:w-9" />
-                    </span>
+                    </button>
                   )}
                 </div>
 
                 {/* 予定バッジ */}
                 <div className="grid grid-cols-2 justify-items-start content-start gap-0 overflow-hidden">
                   {item.dayEvents.slice(1, 3).map((ev) => (
-                    <div
+                    <button
                       key={ev.id}
-                      className="flex h-8 w-8 flex-shrink-0 items-center justify-start md:h-9 md:w-9 [&>span:last-child]:hidden"
+                      type="button"
+                      onClick={(e) => { e.stopPropagation(); onSelectEvent(ev); }}
+                      aria-label={`${ev.title || '予定'}の詳細を表示`}
+                      className="flex h-8 w-8 flex-shrink-0 items-center justify-start rounded-lg hover:bg-pink-soft md:h-9 md:w-9 [&>span:last-child]:hidden"
                     >
                       <span className="flex-shrink-0 flex items-center justify-center">
                         <HandDrawnSvg iconKey={ev.icon_key} className="h-8 w-8 md:h-9 md:w-9" />
                       </span>
                       <span className="truncate">{ev.title || '予定'}</span>
-                    </div>
+                    </button>
                   ))}
 
                   {item.dayEvents.length > 2 && (

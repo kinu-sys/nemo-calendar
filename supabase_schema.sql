@@ -74,6 +74,10 @@ create table if not exists public.events (
   date text not null, -- 'YYYY-MM-DD'
   title text not null default '予定',
   icon_key text not null default 'cat',
+  start_time time,
+  end_time time,
+  location text,
+  memo text,
   created_by uuid references auth.users on delete set null,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null,
   updated_at timestamp with time zone default timezone('utc'::text, now()) not null

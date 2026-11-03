@@ -11,6 +11,7 @@ import { SidePanel } from '@/components/SidePanel';
 import { EventModal } from '@/components/EventModal';
 import { IconManageModal } from '@/components/IconManageModal';
 import { CalendarManagerModal } from '@/components/CalendarManagerModal';
+import { EventEditModal } from '@/components/EventEditModal';
 
 // 日付キーフォーマット YYYY-MM-DD
 function formatDateKey(date: Date): string {
@@ -45,6 +46,8 @@ export default function CalendarAppPage() {
   const [eventModalIconKey, setEventModalIconKey] = useState<string | undefined>(undefined);
   const [isIconManagerOpen, setIsIconManagerOpen] = useState<boolean>(false);
   const [isCalendarManagerOpen, setIsCalendarManagerOpen] = useState<boolean>(false);
+  const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
+  const [editingEvent, setEditingEvent] = useState<CalendarEvent | null>(null);
 
   // 1. 初期化: ユーザーとカレンダー一覧取得
   useEffect(() => {
@@ -271,6 +274,45 @@ export default function CalendarAppPage() {
       }
       return next;
     });
+    setSelectedEvent((prev) => prev?.id === eventId ? null : prev);
+  };
+
+  const handleUpdateEvent = async (event: CalendarEvent, updates: Pick<CalendarEvent, 'title' | 'icon_key' | 'start_time' | 'end_time' | 'location' | 'memo'>) => {
+    let { data, error } = await supabase
+      .from('events')
+      .update(updates)
+      .eq('id', event.id)
+      .select()
+      .single();
+
+    const detailsChanged =
+      updates.start_time !== (event.start_time ?? null) ||
+      updates.end_time !== (event.end_time ?? null) ||
+      updates.location !== (event.location ?? null) ||
+      updates.memo !== (event.memo ?? null);
+    const missingDetailColumn = Boolean(error?.message.match(/could not find the .* column .* schema cache/i));
+
+    if (error && missingDetailColumn && !detailsChanged) {
+      // Allow title/icon edits on databases that have not applied the detail migration yet.
+      const fallback = await supabase
+        .from('events')
+        .update({ title: updates.title, icon_key: updates.icon_key })
+        .eq('id', event.id)
+        .select()
+        .single();
+      data = fallback.data;
+      error = fallback.error;
+    } else if (error && missingDetailColumn) {
+      throw new Error('予定の詳細用カラムがSupabaseにありません。supabase/migrations/202611030001_add_event_details.sql をSupabaseのSQL Editorで実行してから、もう一度保存してください。');
+    }
+    if (error) throw new Error(error.message);
+    if (!data) throw new Error('保存結果を確認できませんでした。');
+    const updated = data as CalendarEvent;
+    setEvents((prev) => ({
+      ...prev,
+      [updated.date]: (prev[updated.date] ?? []).map((item) => item.id === updated.id ? updated : item),
+    }));
+    setSelectedEvent(updated);
   };
 
   // アイコン操作
@@ -404,7 +446,8 @@ export default function CalendarAppPage() {
           currentDate={currentDate}
           selectedDateStr={selectedDateStr}
           events={events}
-          onSelectDate={(d) => setSelectedDateStr(d)}
+          onSelectDate={(d) => { setSelectedDateStr(d); setSelectedEvent(null); }}
+          onSelectEvent={(event) => { setSelectedDateStr(event.date); setSelectedEvent(event); }}
           onOpenAddModal={(d) => {
             setSelectedDateStr(d);
             setEventModalIconKey(undefined);
@@ -426,6 +469,9 @@ export default function CalendarAppPage() {
           }}
           onDeleteEvent={handleDeleteEvent}
           onOpenIconManager={() => setIsIconManagerOpen(true)}
+          selectedEvent={selectedEvent}
+          onSelectEvent={setSelectedEvent}
+          onEditEvent={setEditingEvent}
         />
       </div>
 
@@ -437,6 +483,13 @@ export default function CalendarAppPage() {
         icons={customIcons}
         onClose={() => setIsEventModalOpen(false)}
         onSave={handleSaveEvent}
+      />
+
+      <EventEditModal
+        event={editingEvent}
+        icons={customIcons}
+        onClose={() => setEditingEvent(null)}
+        onSave={handleUpdateEvent}
       />
 
       {/* アイコン管理モーダル */}
