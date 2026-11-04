@@ -87,7 +87,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
         <div>
           <button
             onClick={onToday}
-            className="bg-pink-soft hover:bg-pink-accent text-pink-accent hover:text-white border border-pink-border hover:border-pink-accent px-4 py-1.5 rounded-full text-xs font-bold transition-all shadow-subtle"
+            className="bg-[#f8df9a] hover:bg-[#f2cc68] text-[#72531a] border border-[#e7c96c] hover:border-[#d9b54d] px-4 py-1.5 rounded-full text-xs font-bold transition-all shadow-subtle"
           >
             今日
           </button>
@@ -128,7 +128,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                 key={item.dateKey}
                 onClick={() => onSelectDate(item.dateKey)}
                 onDoubleClick={() => onOpenAddModal(item.dateKey)}
-                className={`min-h-[92px] border-b border-[#f7edea] p-0.5 cursor-pointer transition-all flex flex-col relative select-none ${
+                className={`min-h-[116px] border-b border-[#f7edea] p-0.5 cursor-pointer transition-all flex flex-col relative select-none ${
                   !isRightEdge ? 'border-r border-[#f7edea]' : ''
                 } ${
                   item.isSelected
@@ -138,7 +138,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                     : 'hover:bg-[#fdf7f5]'
                 }`}
               >
-                <div className="flex items-center justify-between mb-0">
+                <div className="mb-0 flex flex-shrink-0 items-center justify-between">
                   <span
                     className={`font-quicksand tabular-nums text-[16px] font-bold inline-flex items-center justify-center ${
                       item.isToday
@@ -152,38 +152,31 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                   >
                     {item.day}
                   </span>
-                  {item.dayEvents[0] && (
-                    <button
-                      type="button"
-                      onClick={(e) => { e.stopPropagation(); onSelectEvent(item.dayEvents[0]); }}
-                      aria-label={`${item.dayEvents[0].title || '予定'}の詳細を表示`}
-                      className="flex h-8 w-8 items-center justify-center rounded-lg hover:bg-pink-soft md:h-9 md:w-9"
-                    >
-                      <HandDrawnSvg iconKey={item.dayEvents[0].icon_key} className="h-8 w-8 md:h-9 md:w-9" />
-                    </button>
-                  )}
                 </div>
 
-                {/* 予定バッジ */}
-                <div className="grid grid-cols-2 justify-items-start content-start gap-0 overflow-hidden">
-                  {item.dayEvents.slice(1, 3).map((ev) => (
+                {/* 日付の下に予定を最大3件表示 */}
+                <div className="flex min-w-0 flex-col gap-0 overflow-hidden">
+                  {item.dayEvents.slice(0, 3).map((ev) => (
                     <button
                       key={ev.id}
                       type="button"
                       onClick={(e) => { e.stopPropagation(); onSelectEvent(ev); }}
                       aria-label={`${ev.title || '予定'}の詳細を表示`}
-                      className="flex h-8 w-8 flex-shrink-0 items-center justify-start rounded-lg hover:bg-pink-soft md:h-9 md:w-9 [&>span:last-child]:hidden"
+                      title={ev.title || '予定'}
+                      className="flex h-7 w-full min-w-0 flex-shrink-0 items-center gap-0 overflow-visible rounded px-0.5 text-left hover:bg-pink-soft"
                     >
-                      <span className="flex-shrink-0 flex items-center justify-center">
-                        <HandDrawnSvg iconKey={ev.icon_key} className="h-8 w-8 md:h-9 md:w-9" />
+                      <span className="flex h-[30px] w-[30px] flex-shrink-0 items-center justify-center">
+                        <HandDrawnSvg iconKey={ev.icon_key} className="h-[30px] w-[30px]" />
                       </span>
-                      <span className="truncate">{ev.title || '予定'}</span>
+                      <span className="min-w-0 truncate font-zen text-[8px] font-bold leading-tight md:text-[10px]">
+                        {ev.title || '予定'}
+                      </span>
                     </button>
                   ))}
 
-                  {item.dayEvents.length > 2 && (
-                    <div className="hidden text-[10px] text-pink-accent font-bold px-1">
-                      +他{item.dayEvents.length - 2}件
+                  {item.dayEvents.length > 3 && (
+                    <div className="truncate px-1 font-zen text-[9px] font-bold leading-tight text-pink-accent md:text-[10px]">
+                      +他{item.dayEvents.length - 3}件
                     </div>
                   )}
                 </div>

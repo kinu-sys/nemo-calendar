@@ -277,7 +277,7 @@ export default function CalendarAppPage() {
     setSelectedEvent((prev) => prev?.id === eventId ? null : prev);
   };
 
-  const handleUpdateEvent = async (event: CalendarEvent, updates: Pick<CalendarEvent, 'title' | 'icon_key' | 'start_time' | 'end_time' | 'location' | 'memo'>) => {
+  const handleUpdateEvent = async (event: CalendarEvent, updates: Pick<CalendarEvent, 'date' | 'title' | 'icon_key' | 'start_time' | 'end_time' | 'location' | 'memo'>) => {
     let { data, error } = await supabase
       .from('events')
       .update(updates)
@@ -296,7 +296,7 @@ export default function CalendarAppPage() {
       // Allow title/icon edits on databases that have not applied the detail migration yet.
       const fallback = await supabase
         .from('events')
-        .update({ title: updates.title, icon_key: updates.icon_key })
+        .update({ date: updates.date, title: updates.title, icon_key: updates.icon_key })
         .eq('id', event.id)
         .select()
         .single();
@@ -308,10 +308,16 @@ export default function CalendarAppPage() {
     if (error) throw new Error(error.message);
     if (!data) throw new Error('保存結果を確認できませんでした。');
     const updated = data as CalendarEvent;
-    setEvents((prev) => ({
-      ...prev,
-      [updated.date]: (prev[updated.date] ?? []).map((item) => item.id === updated.id ? updated : item),
-    }));
+    setEvents((prev) => {
+      const next = { ...prev };
+      next[event.date] = (next[event.date] ?? []).filter((item) => item.id !== updated.id);
+      if (next[event.date].length === 0) delete next[event.date];
+      next[updated.date] = [...(next[updated.date] ?? []).filter((item) => item.id !== updated.id), updated];
+      return next;
+    });
+    setSelectedDateStr(updated.date);
+    const [year, month] = updated.date.split('-').map(Number);
+    setCurrentDate(new Date(year, month - 1, 1));
     setSelectedEvent(updated);
   };
 
@@ -435,7 +441,6 @@ export default function CalendarAppPage() {
         calendars={calendars}
         onSelectCalendar={(cal) => setCurrentCalendar(cal)}
         onOpenCalendarManager={() => setIsCalendarManagerOpen(true)}
-        onOpenIconManager={() => setIsIconManagerOpen(true)}
         userEmail={user?.email}
       />
 

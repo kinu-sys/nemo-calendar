@@ -9,10 +9,11 @@ interface EventEditModalProps {
   event: CalendarEvent | null;
   icons: IconItem[];
   onClose: () => void;
-  onSave: (event: CalendarEvent, updates: Pick<CalendarEvent, 'title' | 'icon_key' | 'start_time' | 'end_time' | 'location' | 'memo'>) => Promise<void>;
+  onSave: (event: CalendarEvent, updates: Pick<CalendarEvent, 'date' | 'title' | 'icon_key' | 'start_time' | 'end_time' | 'location' | 'memo'>) => Promise<void>;
 }
 
 export const EventEditModal: React.FC<EventEditModalProps> = ({ event, icons, onClose, onSave }) => {
+  const [date, setDate] = useState('');
   const [title, setTitle] = useState('');
   const [iconKey, setIconKey] = useState('cat');
   const [startTime, setStartTime] = useState('');
@@ -24,6 +25,7 @@ export const EventEditModal: React.FC<EventEditModalProps> = ({ event, icons, on
 
   useEffect(() => {
     if (!event) return;
+    setDate(event.date);
     setTitle(event.title);
     setIconKey(event.icon_key);
     setStartTime(event.start_time?.slice(0, 5) ?? '');
@@ -39,6 +41,7 @@ export const EventEditModal: React.FC<EventEditModalProps> = ({ event, icons, on
     setSaving(true);
     try {
       await onSave(event, {
+        date,
         title: title.trim() || '予定',
         icon_key: iconKey,
         start_time: startTime || null,
@@ -65,6 +68,8 @@ export const EventEditModal: React.FC<EventEditModalProps> = ({ event, icons, on
         <label className="mb-1 block text-xs font-bold text-text-muted">予定</label>
         <input value={title} onChange={(e) => setTitle(e.target.value)} className="mb-4 w-full rounded-xl border border-card-border bg-bg-soft px-3.5 py-2.5 text-sm outline-none focus:border-pink-accent" />
 
+        <label className="mb-4 block text-xs font-bold text-text-muted">日付<input type="date" required value={date} onChange={(e) => setDate(e.target.value)} className="mt-1.5 w-full rounded-xl border border-card-border bg-bg-soft px-3.5 py-2.5 text-sm font-normal text-text-main outline-none focus:border-pink-accent" /></label>
+
         <div className="mb-4">
           <p className="mb-2 text-xs font-bold text-text-muted">アイコン</p>
           <div className="grid max-h-56 grid-cols-5 gap-1.5 overflow-y-auto p-0">
@@ -81,7 +86,7 @@ export const EventEditModal: React.FC<EventEditModalProps> = ({ event, icons, on
         </div>
         <label className="mt-4 block text-xs font-bold text-text-muted">場所<input value={location} onChange={(e) => setLocation(e.target.value)} placeholder="場所を入力" className="mt-1.5 w-full rounded-xl border border-card-border bg-bg-soft px-3.5 py-2.5 text-sm font-normal text-text-main outline-none focus:border-pink-accent" /></label>
         <label className="mt-4 block text-xs font-bold text-text-muted">メモ<textarea value={memo} onChange={(e) => setMemo(e.target.value)} rows={4} placeholder="予定のメモ" className="mt-1.5 w-full resize-y rounded-xl border border-card-border bg-bg-soft px-3.5 py-2.5 text-sm font-normal text-text-main outline-none focus:border-pink-accent" /></label>
-        <div className="mt-5 flex justify-end gap-2"><button type="button" onClick={onClose} className="rounded-xl bg-[#f2e7e4] px-4 py-2 text-xs font-bold text-text-muted">キャンセル</button><button type="button" disabled={saving} onClick={handleSave} className="rounded-xl bg-pink-accent px-5 py-2 text-xs font-bold text-white disabled:opacity-50">{saving ? '保存中...' : '保存'}</button></div>
+        <div className="mt-5 flex justify-end gap-2"><button type="button" onClick={onClose} className="rounded-xl bg-[#f2e7e4] px-4 py-2 text-xs font-bold text-text-muted">キャンセル</button><button type="button" disabled={saving || !date} onClick={handleSave} className="rounded-xl bg-pink-accent px-5 py-2 text-xs font-bold text-white disabled:opacity-50">{saving ? '保存中...' : '保存'}</button></div>
       </div>
     </div>
   );

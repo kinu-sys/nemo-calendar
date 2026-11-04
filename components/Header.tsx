@@ -3,7 +3,7 @@
 import React from 'react';
 import { Calendar } from '@/types/database';
 import Image from 'next/image';
-import { Settings, Users, LogOut, Share2 } from 'lucide-react';
+import { Users, LogOut } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 
@@ -12,7 +12,6 @@ interface HeaderProps {
   calendars: Calendar[];
   onSelectCalendar: (cal: Calendar) => void;
   onOpenCalendarManager: () => void;
-  onOpenIconManager: () => void;
   userEmail?: string | null;
 }
 
@@ -21,7 +20,6 @@ export const Header: React.FC<HeaderProps> = ({
   calendars,
   onSelectCalendar,
   onOpenCalendarManager,
-  onOpenIconManager,
   userEmail,
 }) => {
   const supabase = createClient();
@@ -33,17 +31,10 @@ export const Header: React.FC<HeaderProps> = ({
     router.refresh();
   };
 
-  const copyInviteCode = () => {
-    if (currentCalendar?.invite_code) {
-      navigator.clipboard.writeText(currentCalendar.invite_code);
-      alert(`招待コード【 ${currentCalendar.invite_code} 】をクリップボードにコピーしました！仲間に共有してください。`);
-    }
-  };
-
   return (
     <header className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_310px] gap-4 md:gap-5 mb-5 px-1">
       <div className="min-w-0">
-        <div className="flex items-center justify-between min-h-[135px] gap-3">
+        <div className="flex items-start justify-start min-h-[135px] gap-3">
           {/* 左端の猫イラスト */}
           <Image
             src="/title-cat.png?v=2"
@@ -53,7 +44,7 @@ export const Header: React.FC<HeaderProps> = ({
             className="w-[135px] h-[135px] object-contain flex-shrink-0"
           />
 
-          {/* カレンダー領域の右端にタイトル */}
+          {/* 猫画像の右側にタイトル */}
           <Image
             src="/leaf-logo.png"
             alt="Nemo Calendar"
@@ -96,17 +87,6 @@ export const Header: React.FC<HeaderProps> = ({
       <div className="flex items-center flex-wrap gap-2 justify-end md:content-start">
         {currentCalendar && (
           <button
-            onClick={copyInviteCode}
-            className="bg-white hover:bg-pink-soft border border-card-border hover:border-pink-border text-text-main hover:text-pink-accent px-3 py-1.5 rounded-full text-xs font-bold transition-all shadow-subtle flex items-center gap-1.5"
-            title="招待コードをコピーしてメンバーを招待"
-          >
-            <Share2 className="w-3.5 h-3.5 text-pink-accent" />
-            <span>招待: {currentCalendar.invite_code}</span>
-          </button>
-        )}
-
-        {currentCalendar && (
-          <button
             onClick={onOpenCalendarManager}
             className="bg-white hover:bg-pink-soft border border-card-border hover:border-pink-border text-text-main hover:text-pink-accent px-3 py-1.5 rounded-full text-xs font-bold transition-all shadow-subtle flex items-center gap-1.5"
             title="カレンダーの参加者を確認"
@@ -115,14 +95,6 @@ export const Header: React.FC<HeaderProps> = ({
             <span>参加者</span>
           </button>
         )}
-
-        <button
-          onClick={onOpenIconManager}
-          className="bg-white hover:bg-pink-soft border border-card-border hover:border-pink-border text-text-main hover:text-pink-accent px-3.5 py-1.5 rounded-full text-xs font-bold transition-all shadow-subtle flex items-center gap-1.5"
-        >
-          <Settings className="w-3.5 h-3.5" />
-          <span>アイコン管理</span>
-        </button>
 
         <button
           onClick={handleLogout}
