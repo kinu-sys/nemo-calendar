@@ -1,0 +1,27 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "開発サーバーを起動",
+      "type": "shell",
+      "command": "npm.cmd run dev",
+      "isBackground": true,
+      "runOptions": {
+        "runOn": "folderOpen"
+      },
+      "problemMatcher": [
+        {
+          "owner": "next-dev-server",
+          "pattern": {
+            "regexp": "^$"
+          },
+          "background": {
+            "activeOnStart": true,
+            "beginsPattern": ".*",
+            "endsPattern": ".*Ready in .*"
+          }
+        }
+      ]
+    }
+  ]
+}
