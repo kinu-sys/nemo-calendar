@@ -460,6 +460,7 @@ export default function CalendarAppPage() {
           }}
           onPrevMonth={handlePrevMonth}
           onNextMonth={handleNextMonth}
+          onChangeMonth={(year, month) => setCurrentDate(new Date(year, month, 1))}
           onToday={handleToday}
         />
 
@@ -474,8 +475,6 @@ export default function CalendarAppPage() {
           }}
           onDeleteEvent={handleDeleteEvent}
           onOpenIconManager={() => setIsIconManagerOpen(true)}
-          selectedEvent={selectedEvent}
-          onSelectEvent={setSelectedEvent}
           onEditEvent={setEditingEvent}
         />
       </div>

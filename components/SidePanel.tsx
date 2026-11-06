@@ -3,7 +3,7 @@
 import React from 'react';
 import { CalendarEvent, IconItem } from '@/types/database';
 import { HandDrawnSvg } from './HandDrawnSvg';
-import { Plus, Trash2, CalendarDays, Sparkles, MapPin, X } from 'lucide-react';
+import { Plus, Trash2, CalendarDays, Sparkles, MapPin } from 'lucide-react';
 
 interface SidePanelProps {
   selectedDateStr: string;
@@ -12,8 +12,6 @@ interface SidePanelProps {
   onOpenAddModal: (iconKey?: string) => void;
   onDeleteEvent: (eventId: string) => void;
   onOpenIconManager: () => void;
-  selectedEvent: CalendarEvent | null;
-  onSelectEvent: (event: CalendarEvent | null) => void;
   onEditEvent: (event: CalendarEvent) => void;
 }
 
@@ -24,8 +22,6 @@ export const SidePanel: React.FC<SidePanelProps> = ({
   onOpenAddModal,
   onDeleteEvent,
   onOpenIconManager,
-  selectedEvent,
-  onSelectEvent,
   onEditEvent,
 }) => {
   // 日付の表示文字列を整形 (例: 10月30日(金))
@@ -67,59 +63,30 @@ export const SidePanel: React.FC<SidePanelProps> = ({
             </div>
           ) : (
             dayEvents.map((ev) => {
-              const isSelected = selectedEvent?.id === ev.id;
               return (
                 <div
                   key={ev.id}
-                  className={`w-full border rounded-xl text-xs text-left ${isSelected ? 'border-pink-border bg-[#fffaf9] p-3' : 'flex items-center justify-between border-card-border bg-bg-soft p-2'}`}
+                  className="w-full rounded-xl border border-pink-border bg-[#fffaf9] p-3 text-left text-xs"
                 >
-                  {isSelected ? (
-                    <>
-                      <div className="flex items-center gap-2">
-                        <HandDrawnSvg iconKey={ev.icon_key} className="h-9 w-9 flex-shrink-0" />
-                        <div className="min-w-0 flex-1">
-                          <div className="truncate text-sm font-bold text-text-main">{ev.title}</div>
-                          <div className="mt-0.5 text-text-muted">{ev.start_time ? `${ev.start_time.slice(0, 5)}${ev.end_time ? `〜${ev.end_time.slice(0, 5)}` : '〜'}` : '時間未設定'}</div>
-                        </div>
-                        <button type="button" onClick={() => onEditEvent(ev)} className="rounded-lg bg-white px-2.5 py-1.5 font-bold text-pink-accent shadow-subtle">編集</button>
-                        <button
-                          type="button"
-                          onClick={() => onDeleteEvent(ev.id)}
-                          className="rounded-md p-1 text-text-muted transition-all hover:bg-red-50 hover:text-sun"
-                          title="削除"
-                          aria-label={`${ev.title}を削除`}
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </button>
-                        <button type="button" onClick={() => onSelectEvent(null)} aria-label="詳細を閉じる" className="p-1 text-text-muted"><X className="h-4 w-4" /></button>
-                      </div>
-                      {ev.location && <div className="mt-2 flex gap-1.5 text-text-muted"><MapPin className="h-3.5 w-3.5 shrink-0" />{ev.location}</div>}
-                      {ev.memo && <p className="mt-2 whitespace-pre-wrap text-text-muted">{ev.memo}</p>}
-                    </>
-                  ) : (
-                    <>
-                      <button type="button" onClick={() => onSelectEvent(ev)} className="flex min-w-0 flex-1 items-center gap-2 overflow-hidden pr-2 text-left">
-                        <span className="flex h-5 w-5 flex-shrink-0 items-center justify-center">
-                          <HandDrawnSvg iconKey={ev.icon_key} className="h-4 w-4" />
-                        </span>
-                        <span className="min-w-0 flex-1 truncate font-medium text-text-main">{ev.title}</span>
-                        {ev.start_time && (
-                          <span className="flex-shrink-0 text-[10px] text-text-muted">
-                            {ev.start_time.slice(0, 5)}{ev.end_time ? `〜${ev.end_time.slice(0, 5)}` : ''}
-                          </span>
-                        )}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => onDeleteEvent(ev.id)}
-                        className="flex-shrink-0 rounded-md p-1 text-text-muted transition-all hover:bg-red-50 hover:text-sun"
-                        title="削除"
-                        aria-label={`${ev.title}を削除`}
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </button>
-                    </>
-                  )}
+                  <div className="flex items-center gap-2">
+                    <HandDrawnSvg iconKey={ev.icon_key} className="h-9 w-9 flex-shrink-0" />
+                    <div className="min-w-0 flex-1">
+                      <div className="truncate text-sm font-bold text-text-main">{ev.title}</div>
+                      <div className="mt-0.5 text-text-muted">{ev.start_time ? `${ev.start_time.slice(0, 5)}${ev.end_time ? `〜${ev.end_time.slice(0, 5)}` : '〜'}` : '時間未設定'}</div>
+                    </div>
+                    <button type="button" onClick={() => onEditEvent(ev)} className="rounded-lg bg-white px-2.5 py-1.5 font-bold text-pink-accent shadow-subtle">編集</button>
+                    <button
+                      type="button"
+                      onClick={() => onDeleteEvent(ev.id)}
+                      className="rounded-md p-1 text-text-muted transition-all hover:bg-red-50 hover:text-sun"
+                      title="削除"
+                      aria-label={`${ev.title}を削除`}
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                  {ev.location && <div className="mt-2 flex gap-1.5 text-text-muted"><MapPin className="h-3.5 w-3.5 shrink-0" />{ev.location}</div>}
+                  {ev.memo && <p className="mt-2 whitespace-pre-wrap text-text-muted">{ev.memo}</p>}
                 </div>
               );
             })

@@ -19,14 +19,11 @@ export const HandDrawnSvg: React.FC<HandDrawnSvgProps> = ({ iconKey, className =
   };
   const imageKey = legacyImageKeys[iconKey] || iconKey;
   if (/\.(png|svg)$/i.test(imageKey)) {
-    const isCompact = className.split(/\s+/).some((name) => name === 'w-3.5' || name === 'w-4');
-    const scaleClass = isCompact
-      ? ''
-      : imageKey === '14_会議.png'
-        ? 'scale-[1.4]'
-        : '';
+    const requestedIconScale = ['34_ビル.png', '09_病院.png', 'デート.png', 'パステルカラーのショッピングバッグ.png'].includes(imageKey)
+      ? 'scale-[0.95]'
+      : '';
     const assetVersion = imageKey === '20_ビール.png' ? '?v=2' : '';
-    return <img src={`/icons/${encodeURIComponent(imageKey)}${assetVersion}`} alt="" className={`${className} object-contain ${scaleClass}`} />;
+    return <img src={`/icons/${encodeURIComponent(imageKey)}${assetVersion}`} alt="" className={`${className} object-contain ${requestedIconScale}`} />;
   }
   // 絵文字が渡された場合はSVGマッピングを確認
   const resolvedKey = EMOJI_TO_SVG[iconKey] || iconKey;

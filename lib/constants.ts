@@ -27,6 +27,7 @@ export const DEFAULT_ICONS: DefaultIconDef[] = [
   { key: '18_電話.png', label: '電話' },
   { key: '19_パソコン.png', label: 'パソコン' },
   { key: '20_ビール.png', label: 'ビール' },
+  { key: '結婚記念日1.png', label: '結婚記念日' },
   { key: '21_家.png', label: '家' },
   { key: '22_掃除.png', label: '掃除' },
   { key: '23_家族.png', label: '家族' },

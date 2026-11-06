@@ -5,7 +5,7 @@
 @tailwind utilities;
 
 :root {
-  --bg-color: #fbf5f4;
+  --bg-color: #faf6e7;
   --card-bg: #ffffff;
   --card-border: #f2e3df;
   --card-shadow: 0 8px 24px rgba(215, 175, 168, 0.12);
