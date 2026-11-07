@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { IconItem } from '@/types/database';
+import { CalendarEvent, IconItem } from '@/types/database';
 import { HandDrawnSvg } from './HandDrawnSvg';
 import { X } from 'lucide-react';
 
@@ -11,8 +11,10 @@ interface EventModalProps {
   initialIconKey?: string;
   icons: IconItem[];
   onClose: () => void;
-  onSave: (dateStr: string, title: string, iconKey: string) => Promise<void>;
+  onSave: (dateStr: string, title: string, iconKey: string, importance: CalendarImportance) => Promise<void>;
 }
+
+type CalendarImportance = CalendarEvent['importance'];
 
 export const EventModal: React.FC<EventModalProps> = ({
   isOpen,
@@ -24,12 +26,14 @@ export const EventModal: React.FC<EventModalProps> = ({
 }) => {
   const [selectedKey, setSelectedKey] = useState<string>(initialIconKey || (icons[0]?.key ?? 'cat'));
   const [title, setTitle] = useState('');
+  const [importance, setImportance] = useState<CalendarImportance>('normal');
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
       setSelectedKey(initialIconKey || (icons[0]?.key ?? 'cat'));
       setTitle('');
+      setImportance('normal');
       setSaving(false);
     }
   }, [isOpen, initialIconKey, icons]);
@@ -42,7 +46,7 @@ export const EventModal: React.FC<EventModalProps> = ({
   const handleSave = async () => {
     setSaving(true);
     try {
-      await onSave(dateStr, title.trim() || '予定', selectedKey);
+      await onSave(dateStr, title.trim() || '予定', selectedKey, importance);
       onClose();
     } catch (e) {
       console.error(e);
@@ -119,6 +123,14 @@ export const EventModal: React.FC<EventModalProps> = ({
             className="w-full px-3.5 py-2.5 bg-bg-soft border border-card-border rounded-xl text-sm outline-none focus:border-pink-accent focus:bg-white focus:ring-2 focus:ring-pink-accent/20 transition-all text-text-main placeholder:text-text-muted/60"
           />
         </div>
+
+        <label className="mb-4 block text-xs font-bold text-text-muted">重要度
+          <select value={importance} onChange={(e) => setImportance(e.target.value as CalendarImportance)} className="mt-1.5 w-full rounded-xl border border-card-border bg-bg-soft px-3.5 py-2.5 text-sm font-normal text-text-main outline-none focus:border-pink-accent">
+            <option value="normal">〇 標準</option>
+            <option value="slight">◎ やや重要</option>
+            <option value="important">◉ 重要</option>
+          </select>
+        </label>
 
         {/* アクションボタン */}
         <div className="flex justify-end gap-2">

@@ -22,7 +22,19 @@ export const HandDrawnSvg: React.FC<HandDrawnSvgProps> = ({ iconKey, className =
     const requestedIconScale = ['34_ビル.png', '09_病院.png', 'デート.png', 'パステルカラーのショッピングバッグ.png'].includes(imageKey)
       ? 'scale-[0.95]'
       : '';
-    const assetVersion = imageKey === '20_ビール.png' ? '?v=2' : '';
+    const assetVersions: Record<string, string> = {
+      '02_誕生日ケーキ.png': '?v=5',
+      '14_会議.png': '?v=4',
+      'デート2.png': '?v=1',
+      'date.png': '?v=2',
+      'Dinner.png': '?v=2',
+      'Lunch.png': '?v=2',
+      '結婚記念日1.png': '?v=2',
+      '20_ビール.png': '?v=3',
+      '07_自転車.png': '?v=3',
+      '24_ライブ.png': '?v=2',
+    };
+    const assetVersion = assetVersions[imageKey] || '';
     return <img src={`/icons/${encodeURIComponent(imageKey)}${assetVersion}`} alt="" className={`${className} object-contain ${requestedIconScale}`} />;
   }
   // 絵文字が渡された場合はSVGマッピングを確認

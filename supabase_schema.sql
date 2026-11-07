@@ -78,6 +78,7 @@ create table if not exists public.events (
   end_time time,
   location text,
   memo text,
+  importance text not null default 'normal' check (importance in ('normal', 'slight', 'important')),
   created_by uuid references auth.users on delete set null,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null,
   updated_at timestamp with time zone default timezone('utc'::text, now()) not null

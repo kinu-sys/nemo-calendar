@@ -32,16 +32,16 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   return (
-    <header className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_310px] gap-4 md:gap-5 mb-5 px-1">
+    <header className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_310px] gap-4 md:gap-5 mb-0 px-1">
       <div className="min-w-0">
-        <div className="flex items-start justify-start min-h-[135px] gap-3">
+        <div className="flex h-[120px] items-start justify-start gap-2">
           {/* 左端の猫イラスト */}
           <Image
             src="/title-cat.png?v=2"
             alt=""
-            width={135}
-            height={135}
-            className="w-[135px] h-[135px] object-contain flex-shrink-0"
+            width={120}
+            height={120}
+            className="h-[120px] w-[120px] flex-shrink-0 object-contain"
           />
 
           {/* 猫画像の右側にタイトル */}
@@ -49,8 +49,8 @@ export const Header: React.FC<HeaderProps> = ({
             src="/leaf-logo.png"
             alt="Nemo Calendar"
             width={300}
-            height={99}
-            className="w-[300px] max-w-[calc(100vw_-_180px)] h-auto object-contain flex-shrink-0"
+            height={100}
+            className="h-auto w-[300px] max-w-[calc(100vw_-_160px)] flex-shrink-0 object-contain"
           />
         </div>
 

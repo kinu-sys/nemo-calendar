@@ -33,6 +33,8 @@ export interface CalendarEvent {
   end_time: string | null;
   location: string | null;
   memo: string | null;
+  importance: 'normal' | 'important' | 'slight';
+  countdown_enabled: boolean;
   created_by: string | null;
   created_at: string;
   updated_at: string;

@@ -34,7 +34,7 @@ const config: Config = {
         weekday: "#8c7a75",
       },
       fontFamily: {
-        zen: ["'Zen Maru Gothic'", "sans-serif"],
+        zen: ["'BIZ UDPGothic'", "sans-serif"],
         quicksand: ["'Quicksand'", "sans-serif"],
       },
       boxShadow: {

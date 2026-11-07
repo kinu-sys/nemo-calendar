@@ -70,7 +70,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
   return (
     <section className="flex flex-col">
       {/* 月ナビゲーション */}
-      <div className="flex justify-between items-center mb-3.5 px-1">
+      <div className="flex justify-between items-center mb-2 px-1">
         <div className="flex items-center gap-2.5">
           <button
             onClick={onPrevMonth}
@@ -86,9 +86,9 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
               id="calendar-year"
               value={year}
               onChange={(e) => onChangeMonth(Number(e.target.value), month)}
-              className="w-[4.4ch] cursor-pointer appearance-none bg-transparent font-quicksand text-[40px] font-bold leading-none tracking-wider outline-none"
+              className="w-[4.4ch] cursor-pointer appearance-none bg-transparent text-[32px] font-bold leading-none tracking-wider outline-none"
             >
-              {years.map((optionYear) => <option key={optionYear} value={optionYear} className="font-quicksand text-[20px]">{optionYear}</option>)}
+              {years.map((optionYear) => <option key={optionYear} value={optionYear} className="text-[12px]">{optionYear}</option>)}
             </select>
             <span className="text-[26px] font-bold">年</span>
             <label className="sr-only" htmlFor="calendar-month">月を選択</label>
@@ -96,13 +96,13 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
               id="calendar-month"
               value={month}
               onChange={(e) => onChangeMonth(year, Number(e.target.value))}
-              className="ml-1 w-[1.7ch] cursor-pointer appearance-none bg-transparent text-right font-quicksand text-[40px] font-bold leading-none tracking-wider outline-none"
+              className="ml-1 w-[2.3ch] cursor-pointer appearance-none bg-transparent text-right text-[32px] font-bold leading-none tracking-wider outline-none"
             >
               {Array.from({ length: 12 }, (_, optionMonth) => (
-                <option key={optionMonth} value={optionMonth} className="font-quicksand text-[20px]">{optionMonth + 1}</option>
+                <option key={optionMonth} value={optionMonth} className="text-[12px]">{optionMonth + 1}</option>
               ))}
             </select>
-            <span className="text-[26px] font-bold">月</span>
+            <span className="ml-1 text-[26px] font-bold">月</span>
           </div>
           <button
             onClick={onNextMonth}
@@ -144,7 +144,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
               key={`prev-${i}`}
               className="min-h-16 border-r border-b border-[#f7edea] p-1.5 bg-[#faf7f6] opacity-60 last:border-r-0"
             >
-              <span className="font-quicksand tabular-nums text-[16px] font-bold text-text-light">{prevDay}</span>
+              <span className="tabular-nums text-[16px] font-bold text-text-light">{prevDay}</span>
             </div>
           ))}
 
@@ -169,7 +169,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
               >
                 <div className="mb-0 flex flex-shrink-0 items-center justify-between">
                   <span
-                    className={`font-quicksand tabular-nums text-[16px] font-bold inline-flex items-center justify-center ${
+                    className={`tabular-nums text-[16px] font-bold inline-flex items-center justify-center ${
                       item.isToday
                         ? 'w-7 h-7 bg-pink-accent text-white rounded-full shadow-pink'
                         : item.holidayName || item.dayOfWeek === 0
@@ -198,12 +198,18 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                       onClick={(e) => { e.stopPropagation(); onSelectEvent(ev); }}
                       aria-label={`${ev.title || '予定'}の詳細を表示`}
                       title={ev.title || '予定'}
-                      className="flex h-7 w-full min-w-0 flex-shrink-0 items-center gap-0 overflow-visible rounded px-0.5 text-left hover:bg-pink-soft"
+                      className="flex h-[30px] w-full min-w-0 flex-shrink-0 items-center gap-0 overflow-visible px-0.5 text-left"
                     >
-                      <span className="flex h-[30px] w-[30px] flex-shrink-0 items-center justify-center">
+                      {ev.icon_key && <span className="flex h-[30px] w-[30px] flex-shrink-0 items-center justify-center">
                         <HandDrawnSvg iconKey={ev.icon_key} className="h-[30px] w-[30px]" />
-                      </span>
-                      <span className="min-w-0 truncate font-zen text-[8px] font-bold leading-tight md:text-[10px]">
+                      </span>}
+                      <span className={`flex h-[26px] min-w-0 items-center truncate rounded px-1 font-zen text-[8px] font-bold leading-tight md:text-[10px] ${
+                        ev.importance === 'important'
+                          ? 'bg-[#536b58] text-white hover:bg-[#455b49]'
+                          : ev.importance === 'slight'
+                          ? 'border border-[#a9b9aa] bg-[#e5ede5] text-[#4e6252] hover:bg-[#dce7dc]'
+                          : 'hover:bg-pink-soft'
+                      }`}>
                         {ev.title || '予定'}
                       </span>
                     </button>
@@ -227,7 +233,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                 (firstDay + lastDate + i + 1) % 7 !== 0 ? 'border-r border-[#f7edea]' : ''
               }`}
             >
-              <span className="font-quicksand tabular-nums text-[16px] font-bold text-text-light">{nextDay}</span>
+              <span className="tabular-nums text-[16px] font-bold text-text-light">{nextDay}</span>
             </div>
           ))}
         </div>

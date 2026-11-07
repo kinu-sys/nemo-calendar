@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@600;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&family=Quicksand:wght@600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -28,7 +28,7 @@
 body {
   background-color: var(--bg-color);
   color: var(--text-main);
-  font-family: 'Zen Maru Gothic', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: 'BIZ UDPGothic', -apple-system, BlinkMacSystemFont, sans-serif;
   letter-spacing: 0.02em;
   min-height: 100vh;
 }

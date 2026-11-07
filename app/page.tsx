@@ -8,7 +8,6 @@ import { DEFAULT_ICONS } from '@/lib/constants';
 import { Header } from '@/components/Header';
 import { CalendarView } from '@/components/CalendarView';
 import { SidePanel } from '@/components/SidePanel';
-import { EventModal } from '@/components/EventModal';
 import { IconManageModal } from '@/components/IconManageModal';
 import { CalendarManagerModal } from '@/components/CalendarManagerModal';
 import { EventEditModal } from '@/components/EventEditModal';
@@ -48,6 +47,7 @@ export default function CalendarAppPage() {
   const [isCalendarManagerOpen, setIsCalendarManagerOpen] = useState<boolean>(false);
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
   const [editingEvent, setEditingEvent] = useState<CalendarEvent | null>(null);
+  const [duplicatingEvent, setDuplicatingEvent] = useState<CalendarEvent | null>(null);
 
   // 1. 初期化: ユーザーとカレンダー一覧取得
   useEffect(() => {
@@ -222,7 +222,7 @@ export default function CalendarAppPage() {
   };
 
   // 予定の追加
-  const handleSaveEvent = async (dateStr: string, title: string, iconKey: string) => {
+  const handleSaveEvent = async (dateStr: string, title: string, iconKey: string, importance: CalendarEvent['importance'], details: Pick<CalendarEvent, 'start_time' | 'end_time' | 'location' | 'memo' | 'countdown_enabled'>) => {
     if (!currentCalendar) {
       throw new Error('保存先のカレンダーが選択されていません。カレンダーを選び直してください。');
     }
@@ -237,6 +237,8 @@ export default function CalendarAppPage() {
         date: dateStr,
         title,
         icon_key: iconKey,
+        importance,
+        ...details,
         created_by: user.id,
       })
       .select()
@@ -244,6 +246,10 @@ export default function CalendarAppPage() {
 
     if (error) {
       console.error('予定の保存エラー:', error);
+      if (error.message.match(/could not find the .*importance.*column|could not find the 'importance' column/i)) {
+        throw new Error('重要度カラムがSupabaseにありません。supabase/migrations/202611070001_add_event_importance.sql を適用してください。');
+      }
+      if (error.message.match(/could not find the .*countdown_enabled.*column|could not find the 'countdown_enabled' column/i)) throw new Error('カウントダウン用カラムがSupabaseにありません。supabase/migrations/202611070002_add_event_countdown.sql を適用してください。');
       throw new Error(error.message);
     }
 
@@ -277,7 +283,61 @@ export default function CalendarAppPage() {
     setSelectedEvent((prev) => prev?.id === eventId ? null : prev);
   };
 
-  const handleUpdateEvent = async (event: CalendarEvent, updates: Pick<CalendarEvent, 'date' | 'title' | 'icon_key' | 'start_time' | 'end_time' | 'location' | 'memo'>) => {
+  const handleDuplicateEvent = (event: CalendarEvent) => {
+    setEditingEvent(null);
+    setDuplicatingEvent(event);
+  };
+
+  const handleSaveDuplicate = async (event: CalendarEvent, updates: Pick<CalendarEvent, 'date' | 'title' | 'icon_key' | 'start_time' | 'end_time' | 'location' | 'memo' | 'importance' | 'countdown_enabled'>) => {
+    if (!user) {
+      throw new Error('ログイン状態を確認できません。');
+    }
+
+    const duplicate = {
+      calendar_id: event.calendar_id,
+      ...updates,
+      created_by: user.id,
+    };
+    let result = await supabase.from('events').insert(duplicate).select().single();
+    if (result.error?.message.match(/could not find the .*importance.*column|could not find the 'importance' column/i)) {
+      throw new Error('重要度カラムがSupabaseにありません。supabase/migrations/202611070001_add_event_importance.sql を適用してください。');
+    }
+    if (result.error?.message.match(/could not find the .*countdown_enabled.*column|could not find the 'countdown_enabled' column/i)) throw new Error('カウントダウン用カラムがSupabaseにありません。supabase/migrations/202611070002_add_event_countdown.sql を適用してください。');
+    const missingDetailColumn = Boolean(result.error?.message.match(/could not find the .* column .* schema cache/i));
+
+    if (result.error && missingDetailColumn) {
+      result = await supabase
+        .from('events')
+        .insert({
+          calendar_id: event.calendar_id,
+          date: updates.date,
+          title: updates.title,
+          icon_key: updates.icon_key,
+          importance: updates.importance,
+          created_by: user.id,
+        })
+        .select()
+        .single();
+    }
+
+    if (result.error) {
+      throw new Error(result.error.message);
+    }
+    if (!result.data) {
+      throw new Error('複製結果を確認できませんでした。画面を更新して予定一覧を確認してください。');
+    }
+
+    const copiedEvent = result.data as CalendarEvent;
+    setEvents((prev) => ({
+      ...prev,
+      [copiedEvent.date]: [...(prev[copiedEvent.date] ?? []), copiedEvent],
+    }));
+    setSelectedDateStr(copiedEvent.date);
+    const [year, month] = copiedEvent.date.split('-').map(Number);
+    setCurrentDate(new Date(year, month - 1, 1));
+  };
+
+  const handleUpdateEvent = async (event: CalendarEvent, updates: Pick<CalendarEvent, 'date' | 'title' | 'icon_key' | 'start_time' | 'end_time' | 'location' | 'memo' | 'importance' | 'countdown_enabled'>) => {
     let { data, error } = await supabase
       .from('events')
       .update(updates)
@@ -289,14 +349,21 @@ export default function CalendarAppPage() {
       updates.start_time !== (event.start_time ?? null) ||
       updates.end_time !== (event.end_time ?? null) ||
       updates.location !== (event.location ?? null) ||
-      updates.memo !== (event.memo ?? null);
+      updates.memo !== (event.memo ?? null) ||
+      updates.importance !== (event.importance ?? 'normal');
+    const anyDetailsChanged = detailsChanged || updates.countdown_enabled !== (event.countdown_enabled ?? false);
     const missingDetailColumn = Boolean(error?.message.match(/could not find the .* column .* schema cache/i));
 
-    if (error && missingDetailColumn && !detailsChanged) {
+    if (error?.message.match(/could not find the .*importance.*column|could not find the 'importance' column/i)) {
+      throw new Error('重要度カラムがSupabaseにありません。supabase/migrations/202611070001_add_event_importance.sql を適用してください。');
+    }
+
+    if (error?.message.match(/could not find the .*countdown_enabled.*column|could not find the 'countdown_enabled' column/i)) throw new Error('カウントダウン用カラムがSupabaseにありません。supabase/migrations/202611070002_add_event_countdown.sql を適用してください。');
+    if (error && missingDetailColumn && !anyDetailsChanged) {
       // Allow title/icon edits on databases that have not applied the detail migration yet.
       const fallback = await supabase
         .from('events')
-        .update({ date: updates.date, title: updates.title, icon_key: updates.icon_key })
+        .update({ date: updates.date, title: updates.title, icon_key: updates.icon_key, importance: updates.importance })
         .eq('id', event.id)
         .select()
         .single();
@@ -431,10 +498,16 @@ export default function CalendarAppPage() {
     );
   }
 
-  const selectedDayEvents = events[selectedDateStr] || [];
+  const selectedDayEvents = [...(events[selectedDateStr] || [])].sort((a, b) => {
+    const timeA = a.start_time?.trim();
+    const timeB = b.start_time?.trim();
+    if (!timeA) return timeB ? 1 : 0;
+    if (!timeB) return -1;
+    return timeA.localeCompare(timeB);
+  });
 
   return (
-    <div className="app-container">
+    <div className="mx-auto w-full max-w-[2240px] px-4">
       {/* ヘッダー */}
       <Header
         currentCalendar={currentCalendar}
@@ -445,7 +518,7 @@ export default function CalendarAppPage() {
       />
 
       {/* メインコンテンツ（2カラム） */}
-      <div className="grid grid-cols-1 md:grid-cols-[1fr_310px] gap-5 items-start">
+      <div className="grid grid-cols-1 items-start gap-3 lg:grid-cols-[minmax(0,1fr)_300px] xl:gap-4">
         {/* 左: カレンダー */}
         <CalendarView
           currentDate={currentDate}
@@ -468,6 +541,7 @@ export default function CalendarAppPage() {
         <SidePanel
           selectedDateStr={selectedDateStr}
           dayEvents={selectedDayEvents}
+          countdownEvents={Object.values(events).flat().filter((item) => item.countdown_enabled && item.date >= new Intl.DateTimeFormat('sv-SE', { timeZone: 'Asia/Tokyo' }).format(new Date())).sort((a, b) => a.date.localeCompare(b.date))}
           quickIcons={customIcons}
           onOpenAddModal={(iconKey) => {
             setEventModalIconKey(iconKey);
@@ -475,25 +549,27 @@ export default function CalendarAppPage() {
           }}
           onDeleteEvent={handleDeleteEvent}
           onOpenIconManager={() => setIsIconManagerOpen(true)}
-          onEditEvent={setEditingEvent}
+          onEditEvent={(event) => { setDuplicatingEvent(null); setEditingEvent(event); }}
+          onDuplicateEvent={handleDuplicateEvent}
         />
       </div>
 
-      {/* 予定追加モーダル */}
-      <EventModal
-        isOpen={isEventModalOpen}
-        dateStr={selectedDateStr}
-        initialIconKey={eventModalIconKey}
-        icons={customIcons}
-        onClose={() => setIsEventModalOpen(false)}
-        onSave={handleSaveEvent}
-      />
-
       <EventEditModal
-        event={editingEvent}
+        event={duplicatingEvent ?? editingEvent}
+        isOpen={isEventModalOpen}
+        initialDate={selectedDateStr}
+        initialIconKey={eventModalIconKey}
+        isDuplicate={Boolean(duplicatingEvent)}
         icons={customIcons}
-        onClose={() => setEditingEvent(null)}
-        onSave={handleUpdateEvent}
+        onClose={() => { setIsEventModalOpen(false); setEditingEvent(null); setDuplicatingEvent(null); }}
+        onSave={duplicatingEvent ? handleSaveDuplicate : handleUpdateEvent}
+        onCreate={(updates) => handleSaveEvent(updates.date, updates.title, updates.icon_key, updates.importance, {
+          start_time: updates.start_time,
+          end_time: updates.end_time,
+          location: updates.location,
+          memo: updates.memo,
+          countdown_enabled: updates.countdown_enabled,
+        })}
       />
 
       {/* アイコン管理モーダル */}
