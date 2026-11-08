@@ -35,6 +35,7 @@ const config: Config = {
       },
       fontFamily: {
         zen: ["'BIZ UDPGothic'", "sans-serif"],
+        noto: ["'Noto Sans JP'", "sans-serif"],
         quicksand: ["'Quicksand'", "sans-serif"],
       },
       boxShadow: {

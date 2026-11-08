@@ -507,7 +507,7 @@ export default function CalendarAppPage() {
   });
 
   return (
-    <div className="mx-auto w-full max-w-[2240px] px-4">
+    <div className="nemo-journal mx-auto w-full max-w-[2240px]">
       {/* ヘッダー */}
       <Header
         currentCalendar={currentCalendar}
@@ -518,7 +518,7 @@ export default function CalendarAppPage() {
       />
 
       {/* メインコンテンツ（2カラム） */}
-      <div className="grid grid-cols-1 items-start gap-3 lg:grid-cols-[minmax(0,1fr)_300px] xl:gap-4">
+      <div className="journal-content grid grid-cols-1 items-start gap-4 lg:grid-cols-[minmax(0,1fr)_300px] xl:gap-5">
         {/* 左: カレンダー */}
         <CalendarView
           currentDate={currentDate}
@@ -552,6 +552,14 @@ export default function CalendarAppPage() {
           onEditEvent={(event) => { setDuplicatingEvent(null); setEditingEvent(event); }}
           onDuplicateEvent={handleDuplicateEvent}
         />
+      </div>
+
+      <div className="journal-footer" aria-hidden="true">
+        <img src="/decorations/botanical-corner-open.png" alt="" className="journal-decoration journal-footer-flower" />
+        <span className="journal-footer-rule journal-footer-rule-left" />
+        <img src="/decorations/open-book.png" alt="" className="journal-decoration journal-footer-book" />
+        <span className="journal-footer-rule journal-footer-rule-right" />
+        <img src="/decorations/botanical-corner-right-open.png" alt="" className="journal-decoration journal-footer-flower journal-footer-flower-right" />
       </div>
 
       <EventEditModal

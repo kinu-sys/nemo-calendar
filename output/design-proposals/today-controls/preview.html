@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="ja">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nemo Calendar — 今日 / Today</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 32px; color: #604c38; background: #f5efe3; font-family: "Yu Gothic", sans-serif; }
+  main { max-width: 960px; margin: auto; }
+  h1 { margin: 0 0 10px; font-size: 22px; font-weight: 500; }
+  p { margin: 0 0 24px; font-size: 13px; }
+  .options { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  article { padding: 24px; border: 1px solid #dac7a5; border-radius: 18px; background: #fffaf1; }
+  h2 { margin: 0; font-size: 16px; font-weight: 500; }
+  .detail { display: flex; align-items: center; justify-content: center; height: 240px; }
+  .large { width: min(100%, 320px); height: 180px; object-fit: contain; }
+  .caption { margin: 0 0 12px; font-size: 12px; color: #8c7b66; }
+  .nav { min-height: 64px; border-top: 1px solid #e9dcc5; padding-top: 14px; display: flex; align-items: center; gap: 8px; }
+  .arrow { width: 39.6px; height: 39.6px; object-fit: contain; pointer-events: none; }
+  .next { transform: scaleX(-1); }
+  .date { white-space: nowrap; font-size: 18px; font-weight: 600; }
+  .today { margin-left: auto; width: 80px; height: 40px; object-fit: contain; pointer-events: none; }
+  @media(max-width: 740px) { body { padding: 16px; } .options { grid-template-columns: 1fr; } }
+</style>
+<main>
+  <h1>「今日」と「Today」</h1>
+  <p>同じ水彩の植物枠で2案。下段は月送りアイコンと並べた表示サイズの目安です。</p>
+  <div class="options">
+    <article>
+      <h2>① 今日 — 明朝体</h2>
+      <div class="detail"><img class="large" src="../../../public/controls/today-ja.png" alt="今日：植物枠と赤い花の水彩ボタン"></div>
+      <p class="caption">表示サイズの目安：80 × 40px</p>
+      <div class="nav">
+        <img class="arrow" src="../../../public/controls/month-chevron-square-natural-90.png" alt="前月">
+        <span class="date">2026 年 11 月</span>
+        <img class="arrow next" src="../../../public/controls/month-chevron-square-natural-90.png" alt="次月">
+        <img class="today" src="../../../public/controls/today-ja.png" alt="今日">
+      </div>
+    </article>
+    <article>
+      <h2>② Today — 斜体</h2>
+      <div class="detail"><img class="large" src="../../../public/controls/today-en.png" alt="Today：植物枠と赤い花の水彩ボタン"></div>
+      <p class="caption">表示サイズの目安：80 × 40px</p>
+      <div class="nav">
+        <img class="arrow" src="../../../public/controls/month-chevron-square-natural-90.png" alt="前月">
+        <span class="date">2026 年 11 月</span>
+        <img class="arrow next" src="../../../public/controls/month-chevron-square-natural-90.png" alt="次月">
+        <img class="today" src="../../../public/controls/today-en.png" alt="Today">
+      </div>
+    </article>
+  </div>
+</main>
+</html>

@@ -3,7 +3,7 @@
 import React from 'react';
 import { CalendarEvent } from '@/types/database';
 import { HandDrawnSvg } from './HandDrawnSvg';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import Image from 'next/image';
 import { getJapaneseHolidays } from '@/lib/japaneseHolidays';
 
 interface CalendarViewProps {
@@ -68,17 +68,18 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
   }
 
   return (
-    <section className="flex flex-col">
+    <section className="journal-calendar flex min-w-0 flex-col">
       {/* 月ナビゲーション */}
-      <div className="flex justify-between items-center mb-2 px-1">
-        <div className="flex items-center gap-2.5">
+      <div className="journal-month-nav flex justify-between items-center mb-2 px-1">
+        <div className="journal-month-controls flex items-center gap-5">
           <button
+            type="button"
             onClick={onPrevMonth}
-            className="translate-y-1 scale-90 origin-bottom bg-white hover:bg-pink-soft border border-card-border hover:border-pink-border px-3.5 py-1.5 rounded-full text-xs font-bold text-text-main hover:text-pink-accent shadow-subtle flex items-center gap-1 transition-all"
+            className="journal-month-button flex h-11 w-11 shrink-0 items-center justify-center rounded-lg transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-accent focus-visible:ring-offset-2"
+            aria-label="前月"
             title="前月"
           >
-            <ChevronLeft className="w-3.5 h-3.5" />
-            <span>前月</span>
+            <Image src="/controls/month-chevron-handdrawn-vine-ivory.png" alt="" width={1254} height={1254} sizes="(max-width: 639px) 43.2px, 39.6px" className="pointer-events-none h-[90%] w-[90%] select-none object-contain" />
           </button>
           <div className="flex items-baseline px-1 text-text-main">
             <label className="sr-only" htmlFor="calendar-year">年を選択</label>
@@ -86,47 +87,53 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
               id="calendar-year"
               value={year}
               onChange={(e) => onChangeMonth(Number(e.target.value), month)}
-              className="w-[4.4ch] cursor-pointer appearance-none bg-transparent text-[32px] font-bold leading-none tracking-wider outline-none"
+              className="w-[4.4ch] cursor-pointer appearance-none bg-transparent font-noto text-[28.8px] font-bold leading-none tracking-normal outline-none"
             >
-              {years.map((optionYear) => <option key={optionYear} value={optionYear} className="text-[12px]">{optionYear}</option>)}
+              {years.map((optionYear) => <option key={optionYear} value={optionYear} className="font-noto text-[12px]">{optionYear}</option>)}
             </select>
-            <span className="text-[26px] font-bold">年</span>
+            <span className="text-[23.4px] font-bold">年</span>
             <label className="sr-only" htmlFor="calendar-month">月を選択</label>
             <select
               id="calendar-month"
               value={month}
               onChange={(e) => onChangeMonth(year, Number(e.target.value))}
-              className="ml-1 w-[2.3ch] cursor-pointer appearance-none bg-transparent text-right text-[32px] font-bold leading-none tracking-wider outline-none"
+              className="ml-1 w-[2.3ch] cursor-pointer appearance-none bg-transparent text-right font-noto text-[28.8px] font-bold leading-none tracking-normal outline-none"
             >
               {Array.from({ length: 12 }, (_, optionMonth) => (
-                <option key={optionMonth} value={optionMonth} className="text-[12px]">{optionMonth + 1}</option>
+                <option key={optionMonth} value={optionMonth} className="font-noto text-[12px]">{optionMonth + 1}</option>
               ))}
             </select>
-            <span className="ml-1 text-[26px] font-bold">月</span>
+            <span className="ml-1 text-[23.4px] font-bold">月</span>
           </div>
           <button
+            type="button"
             onClick={onNextMonth}
-            className="translate-y-1 scale-90 origin-bottom bg-white hover:bg-pink-soft border border-card-border hover:border-pink-border px-3.5 py-1.5 rounded-full text-xs font-bold text-text-main hover:text-pink-accent shadow-subtle flex items-center gap-1 transition-all"
-            title="翌月"
+            className="journal-month-button flex h-11 w-11 shrink-0 items-center justify-center rounded-lg transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-accent focus-visible:ring-offset-2"
+            aria-label="次月"
+            title="次月"
           >
-            <span>翌月</span>
-            <ChevronRight className="w-3.5 h-3.5" />
+            <Image src="/controls/month-chevron-handdrawn-vine-ivory.png" alt="" width={1254} height={1254} sizes="(max-width: 639px) 43.2px, 39.6px" className="journal-month-icon-next pointer-events-none h-[90%] w-[90%] select-none object-contain" />
           </button>
         </div>
-        <div>
+        <div className="shrink-0">
           <button
+            type="button"
             onClick={onToday}
-            className="bg-[#f8df9a] hover:bg-[#f2cc68] text-[#72531a] border border-[#e7c96c] hover:border-[#d9b54d] px-4 py-1.5 rounded-full text-xs font-bold transition-all shadow-subtle"
+            className="flex h-12 w-[88px] items-center justify-center rounded-lg transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-accent focus-visible:ring-offset-2"
+            aria-label="今日に戻る"
+            title="今日に戻る"
           >
-            今日
+            <Image src="/controls/today-en-floral-paper.png" alt="" width={1774} height={887} sizes="88px" className="pointer-events-none h-11 w-[88px] select-none object-contain" />
           </button>
         </div>
       </div>
 
       {/* カレンダー本体 */}
-      <div className="bg-white rounded-3xl border border-card-border shadow-soft overflow-hidden">
+      <div className="journal-calendar-frame">
+        <div className="journal-calendar-corners" aria-hidden="true" />
+      <div className="journal-calendar-grid overflow-hidden rounded-3xl border border-[#d8d0b4] bg-white shadow-[0_8px_24px_rgba(83,107,88,0.10),inset_0_0_0_2px_#f4f0e3]">
         {/* 曜日ヘッダー */}
-        <div className="grid grid-cols-7 bg-[#e8eee5] border-b border-card-border text-center text-[16px] py-2.5 font-bold text-weekday">
+        <div className="grid grid-cols-7 border-b border-[#d8d0b4] bg-gradient-to-r from-[#e7ece4] via-[#f1f0e5] to-[#e7ece4] py-2.5 text-center text-[16px] font-bold text-[#586b5a]">
           <div>月</div>
           <div>火</div>
           <div>水</div>
@@ -142,7 +149,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
           {prevDays.map((prevDay, i) => (
             <div
               key={`prev-${i}`}
-              className="min-h-16 border-r border-b border-[#f7edea] p-1.5 bg-[#faf7f6] opacity-60 last:border-r-0"
+              className="min-h-16 border-r border-b border-[#eee9dc] bg-[#f8f7f1] p-1.5 opacity-60 last:border-r-0"
             >
               <span className="tabular-nums text-[16px] font-bold text-text-light">{prevDay}</span>
             </div>
@@ -157,21 +164,21 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                 key={item.dateKey}
                 onClick={() => onSelectDate(item.dateKey)}
                 onDoubleClick={() => onOpenAddModal(item.dateKey)}
-                className={`min-h-16 border-b border-[#f7edea] p-0.5 cursor-pointer transition-all flex flex-col relative select-none ${
-                  !isRightEdge ? 'border-r border-[#f7edea]' : ''
+                className={`relative flex min-h-16 cursor-pointer select-none flex-col border-b border-[#eee9dc] p-0.5 transition-all ${
+                  !isRightEdge ? 'border-r border-[#eee9dc]' : ''
                 } ${
                   item.isSelected
-                    ? 'bg-[#fdf5f3] ring-2 ring-pink-accent ring-inset'
+                    ? 'bg-[#f0f3ec] ring-2 ring-[#9aa88e] ring-inset'
                     : item.isToday
-                    ? 'bg-[#fef9f8]'
-                    : 'hover:bg-[#fdf7f5]'
+                    ? 'bg-[#f8f7ef]'
+                    : 'hover:bg-[#f7f8f2]'
                 }`}
               >
                 <div className="mb-0 flex flex-shrink-0 items-center justify-between">
                   <span
                     className={`tabular-nums text-[16px] font-bold inline-flex items-center justify-center ${
                       item.isToday
-                        ? 'w-7 h-7 bg-pink-accent text-white rounded-full shadow-pink'
+                        ? 'h-7 w-7 rounded-full border border-[#c3b779] bg-[#657c66] text-white shadow-[0_2px_6px_rgba(83,107,88,0.24)]'
                         : item.holidayName || item.dayOfWeek === 0
                         ? 'text-sun'
                         : item.dayOfWeek === 6
@@ -229,14 +236,15 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
           {Array.from({ length: nextDayCount }, (_, i) => i + 1).map((nextDay, i) => (
             <div
               key={`next-${i}`}
-              className={`min-h-16 border-b border-[#f7edea] p-1.5 bg-[#faf7f6] opacity-60 ${
-                (firstDay + lastDate + i + 1) % 7 !== 0 ? 'border-r border-[#f7edea]' : ''
+              className={`min-h-16 border-b border-[#eee9dc] bg-[#f8f7f1] p-1.5 opacity-60 ${
+                (firstDay + lastDate + i + 1) % 7 !== 0 ? 'border-r border-[#eee9dc]' : ''
               }`}
             >
               <span className="tabular-nums text-[16px] font-bold text-text-light">{nextDay}</span>
             </div>
           ))}
         </div>
+      </div>
       </div>
     </section>
   );

@@ -32,25 +32,26 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   return (
-    <header className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_310px] gap-4 md:gap-5 mb-0 px-1">
+    <header className="journal-header">
+      <img src="/decorations/heraldic-banner-complete.png" alt="" className="journal-decoration journal-banner" />
+      <img src="/decorations/rose-curtain-repaired.png" alt="" className="journal-decoration journal-curtain" />
       <div className="min-w-0">
-        <div className="flex h-[120px] items-start justify-start gap-2">
-          {/* 左端の猫イラスト */}
+        <div className="journal-brand">
           <Image
-            src="/title-cat.png?v=2"
+            src="/decorations/books-and-herbs-final.png"
             alt=""
-            width={120}
-            height={120}
-            className="h-[120px] w-[120px] flex-shrink-0 object-contain"
+            width={1774}
+            height={887}
+            sizes="(max-width: 639px) 106px, (max-width: 1199px) 140px, 190px"
+            className="journal-decoration journal-books"
           />
-
-          {/* 猫画像の右側にタイトル */}
           <Image
-            src="/leaf-logo.png"
+            src="/branding/nemo-calendar-rose.png"
             alt="Nemo Calendar"
             width={300}
             height={100}
-            className="h-auto w-[300px] max-w-[calc(100vw_-_160px)] flex-shrink-0 object-contain"
+            sizes="(min-width: 1600px) 360px, (max-width: 1199px) 280px, 310px"
+            className="journal-logo"
           />
         </div>
 
@@ -84,7 +85,7 @@ export const Header: React.FC<HeaderProps> = ({
       </div>
 
       {/* アクションボタン群 */}
-      <div className="flex items-center flex-wrap gap-2 justify-end md:content-start">
+      <div className="journal-actions flex items-center flex-wrap gap-2 justify-end">
         {currentCalendar && (
           <button
             onClick={onOpenCalendarManager}

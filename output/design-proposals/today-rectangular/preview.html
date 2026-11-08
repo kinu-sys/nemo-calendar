@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="ja">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nemo Calendar — Todayの手描き線と植物 3案</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 28px; background: #f6f0e5; color: #634c37; font-family: "Yu Gothic", sans-serif; }
+  main { max-width: 1160px; margin: auto; }
+  h1 { margin: 0 0 8px; font-size: 21px; font-weight: 500; }
+  p { margin: 0 0 18px; font-size: 13px; line-height: 1.7; }
+  .references { display: flex; align-items: center; justify-content: space-around; height: 150px; margin-bottom: 20px; border: 1px solid #e2d3bb; border-radius: 14px; background: #fffbf3; }
+  .banner { height: 130px; width: 145px; object-fit: contain; }
+  .books { width: 190px; height: auto; }
+  .curtain { width: 240px; height: auto; }
+  .footer { width: 180px; height: auto; }
+  .options { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 16px; }
+  article { min-width: 0; padding: 20px 16px; background: #fffaf2; border: 1px solid #dccaad; border-radius: 16px; }
+  h2 { margin: 0 0 6px; font-size: 17px; font-weight: 500; }
+  .description { min-height: 46px; font-size: 12px; color: #88715a; }
+  .large { width: 100%; height: 174px; object-fit: contain; pointer-events: none; }
+  .caption { margin: 20px 0 10px; font-size: 12px; color: #88715a; }
+  .actual { display: flex; height: 82px; align-items: center; justify-content: center; border-top: 1px solid #e7d9c4; }
+  .actual img { width: 88px; height: 44px; object-fit: contain; pointer-events: none; }
+  .nav { margin-top: 12px; display: flex; align-items: center; justify-content: space-between; gap: 8px; border-top: 1px solid #e7d9c4; padding-top: 14px; }
+  .month { display: flex; align-items: center; gap: 6px; white-space: nowrap; font-size: 14px; font-weight: 600; }
+  .arrow { width: 39.6px; height: 39.6px; object-fit: contain; }
+  .next { transform: scaleX(-1); }
+  .today { width: 88px; height: 44px; flex-shrink: 0; object-fit: contain; }
+  @media(max-width: 900px) { .options { grid-template-columns: 1fr; } .references { height: auto; padding: 12px; flex-wrap: wrap; gap: 16px; } }
+</style>
+<main>
+  <h1>Today — 手描きの線と植物で囲む3案</h1>
+  <p>上段は現在の画面のイラスト。囲みは四角寄りの手描き線を基本に、花や葉を一部だけ添えてシンプルにしています。</p>
+  <div class="references">
+    <img class="banner" src="../../../public/decorations/heraldic-banner-complete.png" alt="左上の旗と蔓">
+    <img class="books" src="../../../public/decorations/books-and-herbs-final.png" alt="左上の本と薬草">
+    <img class="curtain" src="../../../public/decorations/rose-curtain-repaired.png" alt="右上のローズカーテン">
+    <img class="footer" src="../../../public/decorations/botanical-corner-open.png" alt="下部の植物">
+  </div>
+  <div class="options">
+    <article>
+      <h2>① 小花と対角の線枠</h2>
+      <p class="description">左下のピンクの花と右上の小さな蕾。手描きの線で軽やかに囲む。</p>
+      <img class="large" src="01-floral-corners.png" alt="Today：小花と対角の線枠">
+      <p class="caption">表示サイズの目安：88 × 44px</p>
+      <div class="actual"><img src="01-floral-corners.png" alt="小花と対角の線枠を88×44pxで表示"></div>
+      <div class="nav"><div class="month"><img class="arrow" src="../../../public/controls/month-chevron-square-natural-90.png" alt="前月">2026 年 11 月<img class="arrow next" src="../../../public/controls/month-chevron-square-natural-90.png" alt="次月"></div><img class="today" src="01-floral-corners.png" alt="Today"></div>
+    </article>
+    <article>
+      <h2>② 刺繍風の小花と線枠</h2>
+      <p class="description">カーテンの刺繍を参考に、左上と右下へ小さな淡い花を添える。</p>
+      <img class="large" src="02-embroidered-blossoms.png" alt="Today：刺繍風の小花">
+      <p class="caption">表示サイズの目安：88 × 44px</p>
+      <div class="actual"><img src="02-embroidered-blossoms.png" alt="刺繍風の小花を88×44pxで表示"></div>
+      <div class="nav"><div class="month"><img class="arrow" src="../../../public/controls/month-chevron-square-natural-90.png" alt="前月">2026 年 11 月<img class="arrow next" src="../../../public/controls/month-chevron-square-natural-90.png" alt="次月"></div><img class="today" src="02-embroidered-blossoms.png" alt="Today"></div>
+    </article>
+    <article>
+      <h2>③ 薬草の葉と線枠</h2>
+      <p class="description">手帳のような線枠に少量の薬草の葉。落ち着いたセージ色を中心に。</p>
+      <img class="large" src="03-herbal-journal.png" alt="Today：薬草の手帳">
+      <p class="caption">表示サイズの目安：88 × 44px</p>
+      <div class="actual"><img src="03-herbal-journal.png" alt="薬草の手帳を88×44pxで表示"></div>
+      <div class="nav"><div class="month"><img class="arrow" src="../../../public/controls/month-chevron-square-natural-90.png" alt="前月">2026 年 11 月<img class="arrow next" src="../../../public/controls/month-chevron-square-natural-90.png" alt="次月"></div><img class="today" src="03-herbal-journal.png" alt="Today"></div>
+    </article>
+  </div>
+</main>
+</html>

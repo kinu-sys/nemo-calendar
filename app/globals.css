@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&family=Quicksand:wght@600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&family=Noto+Sans+JP:wght@400;500;700&family=Quicksand:wght@600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -48,4 +48,225 @@ body {
 }
 ::-webkit-scrollbar-thumb:hover {
   background: #e89587;
+}
+
+/* The journal theme is scoped to the calendar; login and dialogs keep their flows. */
+.nemo-journal {
+  --journal-bottom-padding: 12px;
+  --journal-footer-padding: 8px;
+  --journal-side-padding: 24px;
+  /* Match the reference crop: its corner artwork starts 13px from the edge. */
+  --journal-corner-inset: 13px;
+  --journal-month-nav-height: 48px;
+  --journal-month-nav-gap: 4px;
+  --journal-header-height: 136px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  isolation: isolate;
+  min-height: 100vh;
+  padding: 20px var(--journal-side-padding) var(--journal-bottom-padding);
+  background:
+    radial-gradient(ellipse at 8% 12%, #e9e1bd30, transparent 42%),
+    radial-gradient(ellipse at 96% 80%, #e8c7b82b, transparent 38%),
+    linear-gradient(115deg, #fffaf1, #fcf7ed 55%, #fffaf3);
+  color: #594633;
+}
+.nemo-journal::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  /* The sampled stroke sits 4.5px inside its transparent nine-slice edge.
+     Its bottom center matches the lower ink line inside the footer PNGs. */
+  inset: 3px 3px calc(var(--journal-bottom-padding) + var(--journal-footer-padding) - 4.5px);
+  border: 40px solid transparent;
+  border-image-source: url('/decorations/handdrawn-frame-rounded.png');
+  border-image-slice: 40;
+  border-image-repeat: round;
+  /* Leave the lower frame open beneath the book/inner stems and corner roots.
+     Percentages here use the frame width; add 6px to recover the page width. */
+  --frame-content-width: calc(100% + 6px - var(--journal-side-padding) * 2);
+  --frame-left-width: min(calc(var(--frame-content-width) * 0.176), 206.4px);
+  --frame-right-width: min(calc(var(--frame-content-width) * 0.176), 211.2px);
+  --frame-book-width: min(calc(var(--frame-content-width) * 0.312), 312px);
+  --frame-book-middle: calc(50% + (var(--frame-left-width) - var(--frame-right-width)) * 0.5);
+  --frame-root-start: calc(var(--journal-corner-inset) - 3px);
+  mask-image:
+    linear-gradient(to top, transparent 9px, #000 9px),
+    linear-gradient(to right,
+      #000 0 var(--frame-root-start),
+      transparent var(--frame-root-start) calc(var(--frame-root-start) + var(--frame-left-width) * 0.42),
+      #000 calc(var(--frame-root-start) + var(--frame-left-width) * 0.42) calc(var(--frame-book-middle) - var(--frame-book-width) * 0.24),
+      transparent calc(var(--frame-book-middle) - var(--frame-book-width) * 0.24) calc(var(--frame-book-middle) + var(--frame-book-width) * 0.24),
+      #000 calc(var(--frame-book-middle) + var(--frame-book-width) * 0.24) calc(100% - var(--frame-root-start) - var(--frame-right-width) * 0.4),
+      transparent calc(100% - var(--frame-root-start) - var(--frame-right-width) * 0.4) calc(100% - var(--frame-root-start)),
+      #000 calc(100% - var(--frame-root-start)) 100%);
+  mask-size: 100% 100%, 100% 9px;
+  mask-position: 0 0, 0 100%;
+  mask-repeat: no-repeat;
+  mask-composite: add;
+  pointer-events: none;
+}
+.journal-decoration {
+  pointer-events: none;
+  user-select: none;
+  object-fit: contain;
+}
+.journal-header { position: relative; min-height: var(--journal-header-height); }
+.journal-brand { position: relative; display: flex; align-items: center; gap: 24px; min-height: 128px; padding-left: 100px; }
+.journal-logo { width: 310px; height: auto; min-width: 0; max-width: 100%; }
+/* The crop grew from 151px to 250px; preserve the original flag's scale. */
+.journal-banner { --banner-width: 132px; position: absolute; left: -18px; top: -20px; width: calc(var(--banner-width) * 250 / 151); height: auto; }
+.journal-books { width: 190px; height: auto; flex-shrink: 0; }
+.journal-curtain { position: absolute; top: -20px; right: -24px; width: min(44%, 600px); height: auto; }
+.journal-actions { position: absolute; top: 0; right: 0; z-index: 1; }
+.journal-actions button { background-color: #fffdf8f5; border-color: #d9bea0; color: #6b4e37; }
+.journal-content { position: relative; container-type: inline-size; }
+.journal-month-nav { min-height: var(--journal-month-nav-height); gap: 12px; margin-bottom: var(--journal-month-nav-gap); }
+.journal-month-controls { position: relative; justify-content: center; flex: 1; min-width: 0; }
+.journal-month-icon-next { transform: scaleX(-1); }
+.journal-month-controls::before {
+  content: '';
+  position: absolute;
+  top: -19px;
+  width: 180px;
+  height: 23px;
+  background: url('/decorations/month-flourish.png') center / contain no-repeat;
+  pointer-events: none;
+}
+.journal-month-controls select:focus-visible { outline: 2px solid #8c9e80; outline-offset: 4px; border-radius: 4px; }
+.journal-calendar-frame {
+  position: relative;
+  border: 1px solid #c39a5b;
+  border-radius: 25px;
+  padding-top: 20px;
+  background: #fffdf7;
+  box-shadow: 0 5px 16px #95744713, inset 0 0 0 3px #fffdf7;
+}
+.journal-calendar-corners {
+  position: absolute;
+  inset: 3px 5px auto;
+  height: 15px;
+  background: url('/decorations/card-corner.png') left top / 22px 18px no-repeat;
+  pointer-events: none;
+}
+.journal-calendar-grid { border-color: #d9c9a8; border-radius: 19px 19px 24px 24px; box-shadow: none; }
+.journal-calendar-grid > .grid:last-child > div { min-width: 0; min-height: 100px; }
+.journal-sidebar {
+  /* Match the curtain's displayed 628:288 aspect ratio, with 16px clearance.
+     Its top is at page y=0; this grid starts after 20px padding + the header. */
+  --curtain-height: calc(min(44cqw, 600px) * 288 / 628);
+  padding-top: max(
+    calc(var(--journal-month-nav-height) + var(--journal-month-nav-gap)),
+    calc(var(--curtain-height) + 16px - 20px - var(--journal-header-height))
+  );
+}
+.journal-sidebar > div {
+  position: relative;
+  background-color: #fffdfa;
+  border-color: #d2b27c;
+  box-shadow: 0 5px 15px #92744412;
+}
+.journal-sidebar > div::before,
+.journal-sidebar > div::after {
+  content: '';
+  position: absolute;
+  inset: 3px auto auto 5px;
+  width: 15px;
+  height: 13px;
+  background: url('/decorations/card-corner.png') center / contain no-repeat;
+  pointer-events: none;
+}
+.journal-sidebar > div::after { inset: auto 5px 3px auto; transform: rotate(180deg); }
+.journal-sidebar { --journal-card-corner: url('/decorations/card-corner.png'); }
+.journal-sidebar > div {
+  background-image: var(--journal-card-corner), var(--journal-card-corner);
+  background-position: right 5px top 3px, left 5px bottom 3px;
+  background-size: 12px 10px;
+  background-repeat: no-repeat;
+}
+.journal-sidebar > div > div:first-child { flex-wrap: wrap; gap: 8px; }
+.journal-footer {
+  display: grid;
+  grid-template-columns: min(17.6%, 206.4px) minmax(0, 1fr) min(31.2%, 312px) minmax(0, 1fr) min(17.6%, 211.2px);
+  align-items: end;
+  container-type: inline-size;
+  min-height: 150px;
+  margin-top: auto;
+  flex-shrink: 0;
+  padding-bottom: var(--journal-footer-padding);
+}
+/* The PNGs' lower strokes form the frame's bottom edge.
+   The sampled frame turns upward through rounded corners outside the flowers. */
+.journal-footer-flower {
+  width: 100%;
+  height: auto;
+  transform: translate(calc(var(--journal-corner-inset) - var(--journal-side-padding)), 2.517986%);
+}
+.journal-footer-flower-right {
+  transform: translate(calc(var(--journal-side-padding) - var(--journal-corner-inset)), 2.011494%);
+}
+.journal-footer-book { width: 100%; height: auto; transform: translateY(11.458333%); }
+.journal-footer-rule {
+  position: relative;
+  min-width: 0;
+  height: 0;
+  pointer-events: none;
+  /* Lower line centers minus the vine-tip center, scaled with each PNG. */
+  --rule-rise: calc(min(17.6cqw, 206.4px) * 0.052325581);
+}
+.journal-footer-rule-right { --rule-rise: calc(min(17.6cqw, 211.2px) * 0.051136364); }
+/* The original upper rule has two pale strokes, three source pixels apart.
+   Its lower stroke meets the vine tip; the outer frame remains separate. */
+.journal-footer-rule::before {
+  content: '';
+  position: absolute;
+  left: -1px;
+  right: -1px;
+  bottom: calc(var(--rule-rise) - 5px);
+  height: 12px;
+  background: url('/decorations/handdrawn-double-rule.png') center / 310px 12px repeat-x;
+}
+.journal-footer-rule-left::before { left: calc(var(--journal-corner-inset) - var(--journal-side-padding) - 1px); }
+.journal-footer-rule-right::before { right: calc(var(--journal-corner-inset) - var(--journal-side-padding) - 1px); }
+@media (min-width: 1600px) {
+  .journal-logo { width: 360px; }
+}
+@media (max-width: 1199px) {
+  .journal-brand { padding-left: 100px; gap: 20px; }
+  .journal-logo { width: 280px; }
+  .journal-books { width: 140px; }
+  .journal-curtain { width: 38%; }
+  .journal-sidebar { --curtain-height: calc(38cqw * 288 / 628); }
+}
+@media (max-width: 1023px) {
+  .journal-sidebar { padding-top: 0; }
+  .journal-footer { min-height: 115px; }
+}
+@media (max-width: 899px) {
+  .journal-curtain { display: none; }
+}
+@media (max-width: 639px) {
+  .nemo-journal { --journal-bottom-padding: 8px; --journal-side-padding: 10px; --journal-month-nav-height: 48px; padding: 14px var(--journal-side-padding) var(--journal-bottom-padding); }
+  .journal-header { min-height: 126px; }
+  .journal-brand { min-height: 114px; gap: 12px; padding: 34px 0 0 68px; }
+  .journal-logo { width: min(100%, 280px); }
+  .journal-banner { --banner-width: 74px; left: -6px; top: -14px; }
+  .journal-books { width: 106px; }
+  .journal-curtain { display: none; }
+  .journal-actions { top: 0; right: 0; }
+  .journal-month-nav { flex-wrap: nowrap; justify-content: space-between; gap: 8px; }
+  .journal-month-controls { flex-basis: auto; gap: 8px; }
+  .journal-month-controls > button { width: 48px; height: 48px; }
+  .journal-month-controls select { font-size: 25px; }
+  .journal-month-controls span { font-size: 20px; }
+  .journal-month-controls::before { top: -15px; width: 135px; height: 15px; }
+  .journal-calendar-frame { padding-top: 18px; }
+  .journal-calendar-grid > .grid:last-child > div { min-height: 100px; }
+  .journal-footer { min-height: 86px; }
+}
+@media (max-width: 399px) {
+  .journal-month-nav { flex-wrap: wrap; justify-content: flex-end; }
+  .journal-month-controls { flex-basis: 100%; }
 }
