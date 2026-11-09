@@ -63,7 +63,11 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
       isToday: isCurrentMonth && realToday.getDate() === day,
       isSelected: dateKey === selectedDateStr,
       holidayName: holidays.get(dateKey),
-      dayEvents: events[dateKey] || [],
+      dayEvents: [...(events[dateKey] || [])].sort((a, b) => {
+        const timeA = a.start_time?.trim() || '';
+        const timeB = b.start_time?.trim() || '';
+        return timeA.localeCompare(timeB);
+      }),
     });
   }
 
@@ -79,7 +83,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
             aria-label="前月"
             title="前月"
           >
-            <Image src="/controls/month-chevron-handdrawn-vine-ivory.png" alt="" width={1254} height={1254} sizes="(max-width: 639px) 43.2px, 39.6px" className="pointer-events-none h-[90%] w-[90%] select-none object-contain" />
+            <Image src="/controls/month-chevron-aged-paper-bold.png" alt="" width={1254} height={1254} sizes="(max-width: 639px) 36.72px, 33.66px" className="pointer-events-none h-[76.5%] w-[76.5%] select-none object-contain" />
           </button>
           <div className="flex items-baseline px-1 text-text-main">
             <label className="sr-only" htmlFor="calendar-year">年を選択</label>
@@ -112,7 +116,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
             aria-label="次月"
             title="次月"
           >
-            <Image src="/controls/month-chevron-handdrawn-vine-ivory.png" alt="" width={1254} height={1254} sizes="(max-width: 639px) 43.2px, 39.6px" className="journal-month-icon-next pointer-events-none h-[90%] w-[90%] select-none object-contain" />
+            <Image src="/controls/month-chevron-aged-paper-bold.png" alt="" width={1254} height={1254} sizes="(max-width: 639px) 36.72px, 33.66px" className="journal-month-icon-next pointer-events-none h-[76.5%] w-[76.5%] select-none object-contain" />
           </button>
         </div>
         <div className="shrink-0">
@@ -131,9 +135,9 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
       {/* カレンダー本体 */}
       <div className="journal-calendar-frame">
         <div className="journal-calendar-corners" aria-hidden="true" />
-      <div className="journal-calendar-grid overflow-hidden rounded-3xl border border-[#d8d0b4] bg-white shadow-[0_8px_24px_rgba(83,107,88,0.10),inset_0_0_0_2px_#f4f0e3]">
+      <div className="journal-calendar-grid overflow-hidden rounded-3xl bg-white">
         {/* 曜日ヘッダー */}
-        <div className="grid grid-cols-7 border-b border-[#d8d0b4] bg-gradient-to-r from-[#e7ece4] via-[#f1f0e5] to-[#e7ece4] py-2.5 text-center text-[16px] font-bold text-[#586b5a]">
+        <div className="grid grid-cols-7 border-b border-[#d8d0b4] bg-gradient-to-r from-[#e7ece4] via-[#f1f0e5] to-[#e7ece4] py-1 text-center text-[12.8px] leading-5 font-bold text-[#586b5a]">
           <div>月</div>
           <div>火</div>
           <div>水</div>

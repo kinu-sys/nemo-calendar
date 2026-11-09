@@ -45,7 +45,7 @@ export const SidePanel: React.FC<SidePanelProps> = ({
   };
 
   return (
-    <aside className="journal-sidebar flex min-w-0 flex-col gap-4">
+    <aside className="journal-sidebar flex min-w-0 flex-col gap-2">
       {/* 選択日の予定カード */}
       <div className="bg-white rounded-3xl border border-card-border shadow-soft p-4">
         <div className="flex justify-between items-center pb-2.5 mb-3 border-b border-dashed border-card-border">

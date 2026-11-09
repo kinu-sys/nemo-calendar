@@ -38,20 +38,20 @@ export const Header: React.FC<HeaderProps> = ({
       <div className="min-w-0">
         <div className="journal-brand">
           <Image
-            src="/decorations/books-and-herbs-final.png"
-            alt=""
-            width={1774}
-            height={887}
-            sizes="(max-width: 639px) 106px, (max-width: 1199px) 140px, 190px"
-            className="journal-decoration journal-books"
-          />
-          <Image
             src="/branding/nemo-calendar-rose.png"
             alt="Nemo Calendar"
             width={300}
             height={100}
             sizes="(min-width: 1600px) 360px, (max-width: 1199px) 280px, 310px"
             className="journal-logo"
+          />
+          <Image
+            src="/decorations/books-and-herbs-final.png"
+            alt=""
+            width={1774}
+            height={887}
+            sizes="(max-width: 639px) 106px, (max-width: 1199px) 140px, 190px"
+            className="journal-decoration journal-books"
           />
         </div>
 

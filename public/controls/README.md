@@ -32,3 +32,7 @@ CalendarViewで前月の画像として使用し、次月はCSSで左右反転�
 - `today-ja.png`・`today-en.png`: 日本語と英語の最初の比較案。`today-en-large-text.png` は文字拡大後・中央調整前の版として保持。
 - 制作は組み込みimagegen。[制作指示・比較案](../../output/design-proposals/today-controls/README.md)に各画像とプロンプトへのリンクを記載。
 - 操作は既存のonTodayを使用。「今日に戻る」のaria-labelとtitle、キーボード操作とフォーカス表示を維持。装飾画像はpointer-events:none、altは空。
+# 月送りの古紙版
+
+- `month-chevron-aged-paper.png`: Todayの紙と筆跡に合わせた花・葉なしの生成画像。中央の＜を従来より約15％拡大。表示は従来の85％、次月には左右反転して使用。
+- `month-chevron-aged-paper-bold.png`: 古紙版のマークだけを太さ約1.5倍・大きさ約1.2倍へ編集した現行版。アイコン全体の表示サイズは維持。

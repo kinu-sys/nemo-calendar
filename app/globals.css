@@ -54,18 +54,20 @@ body {
 .nemo-journal {
   --journal-bottom-padding: 12px;
   --journal-footer-padding: 8px;
+  --journal-footer-overlap: 44px;
   --journal-side-padding: 24px;
   /* Match the reference crop: its corner artwork starts 13px from the edge. */
   --journal-corner-inset: 13px;
   --journal-month-nav-height: 48px;
   --journal-month-nav-gap: 4px;
-  --journal-header-height: 136px;
+  --journal-header-height: 116px;
   position: relative;
   display: flex;
   flex-direction: column;
   min-width: 0;
   isolation: isolate;
-  min-height: 100vh;
+  /* Size the journal and its outer frame to the content; spare viewport stays below. */
+  min-height: 0;
   padding: 20px var(--journal-side-padding) var(--journal-bottom-padding);
   background:
     radial-gradient(ellipse at 8% 12%, #e9e1bd30, transparent 42%),
@@ -113,16 +115,30 @@ body {
   user-select: none;
   object-fit: contain;
 }
-.journal-header { position: relative; min-height: var(--journal-header-height); }
-.journal-brand { position: relative; display: flex; align-items: center; gap: 24px; min-height: 128px; padding-left: 100px; }
+.journal-header {
+  --banner-width: 132px;
+  --banner-art-width: calc(var(--banner-width) * 250 / 151);
+  --banner-left: -18px;
+  --curtain-width: min(44%, 600px);
+  /* Artwork anchors: banner fabric ends at x=110/250; curtain tassel at x=117/628. */
+  --brand-left: calc(var(--banner-left) + var(--banner-art-width) * 110 / 250);
+  --brand-right: max(0px, calc(var(--curtain-width) * 511 / 628 - 24px));
+  position: relative;
+  min-height: var(--journal-header-height);
+}
+.journal-brand { position: relative; display: flex; align-items: center; justify-content: center; gap: 24px; min-height: 108px; margin-left: var(--brand-left); margin-right: var(--brand-right); }
 .journal-logo { width: 310px; height: auto; min-width: 0; max-width: 100%; }
 /* The crop grew from 151px to 250px; preserve the original flag's scale. */
-.journal-banner { --banner-width: 132px; position: absolute; left: -18px; top: -20px; width: calc(var(--banner-width) * 250 / 151); height: auto; }
-.journal-books { width: 190px; height: auto; flex-shrink: 0; }
-.journal-curtain { position: absolute; top: -20px; right: -24px; width: min(44%, 600px); height: auto; }
+.journal-banner { position: absolute; z-index: 2; left: var(--banner-left); top: -20px; width: var(--banner-art-width); height: auto; }
+.journal-books { width: 190px; height: auto; min-width: 0; flex-shrink: 1; }
+.journal-curtain { position: absolute; z-index: 1; top: -20px; right: -24px; width: var(--curtain-width); height: auto; }
 .journal-actions { position: absolute; top: 0; right: 0; z-index: 1; }
 .journal-actions button { background-color: #fffdf8f5; border-color: #d9bea0; color: #6b4e37; }
-.journal-content { position: relative; container-type: inline-size; }
+.journal-content {
+  position: relative;
+  container-type: inline-size;
+  margin-bottom: calc(0px - var(--journal-footer-overlap));
+}
 .journal-month-nav { min-height: var(--journal-month-nav-height); gap: 12px; margin-bottom: var(--journal-month-nav-gap); }
 .journal-month-controls { position: relative; justify-content: center; flex: 1; min-width: 0; }
 .journal-month-icon-next { transform: scaleX(-1); }
@@ -138,53 +154,44 @@ body {
 .journal-month-controls select:focus-visible { outline: 2px solid #8c9e80; outline-offset: 4px; border-radius: 4px; }
 .journal-calendar-frame {
   position: relative;
-  border: 1px solid #c39a5b;
+  border: 0;
   border-radius: 25px;
-  padding-top: 20px;
+  padding: 0;
   background: #fffdf7;
-  box-shadow: 0 5px 16px #95744713, inset 0 0 0 3px #fffdf7;
+  box-shadow: 0 5px 16px #95744713;
 }
 .journal-calendar-corners {
   position: absolute;
-  inset: 3px 5px auto;
-  height: 15px;
-  background: url('/decorations/card-corner.png') left top / 22px 18px no-repeat;
+  /* Place the gold ink just inside the grid edge so it covers the outer rule. */
+  inset: -6px;
+  z-index: 1;
+  border: 44px solid transparent;
+  border-image: url('/decorations/calendar-arcade-frame.png') 220 / 44px / 0 stretch;
   pointer-events: none;
 }
-.journal-calendar-grid { border-color: #d9c9a8; border-radius: 19px 19px 24px 24px; box-shadow: none; }
-.journal-calendar-grid > .grid:last-child > div { min-width: 0; min-height: 100px; }
+.journal-calendar-grid { border: 0; border-radius: 25px; box-shadow: none; }
+.journal-calendar-grid > .grid:last-child > div { min-width: 0; min-height: 64px; }
+.journal-calendar-grid > .grid:last-child > div:nth-last-child(-n + 7) { border-bottom: 0; }
 .journal-sidebar {
-  /* Match the curtain's displayed 628:288 aspect ratio, with 16px clearance.
-     Its top is at page y=0; this grid starts after 20px padding + the header. */
-  --curtain-height: calc(min(44cqw, 600px) * 288 / 628);
-  padding-top: max(
-    calc(var(--journal-month-nav-height) + var(--journal-month-nav-gap)),
-    calc(var(--curtain-height) + 16px - 20px - var(--journal-header-height))
-  );
+  /* Start the cards 12px below the calendar frame, allowing curtain overlap. */
+  padding-top: calc(var(--journal-month-nav-height) + var(--journal-month-nav-gap) + 12px);
 }
 .journal-sidebar > div {
   position: relative;
-  background-color: #fffdfa;
-  border-color: #d2b27c;
+  background-color: #fcf7ed;
+  border: 0;
+  border-radius: 18px;
+  padding: 14px;
   box-shadow: 0 5px 15px #92744412;
 }
-.journal-sidebar > div::before,
-.journal-sidebar > div::after {
+.journal-sidebar > div::before {
   content: '';
   position: absolute;
-  inset: 3px auto auto 5px;
-  width: 15px;
-  height: 13px;
-  background: url('/decorations/card-corner.png') center / contain no-repeat;
+  inset: 0;
+  /* Keep the leaves at their original proportions; stretch only the side strokes. */
+  border: 18px solid transparent;
+  border-image: url('/decorations/card-vine-frame-v3.png') 170 / 18px / 0 stretch;
   pointer-events: none;
-}
-.journal-sidebar > div::after { inset: auto 5px 3px auto; transform: rotate(180deg); }
-.journal-sidebar { --journal-card-corner: url('/decorations/card-corner.png'); }
-.journal-sidebar > div {
-  background-image: var(--journal-card-corner), var(--journal-card-corner);
-  background-position: right 5px top 3px, left 5px bottom 3px;
-  background-size: 12px 10px;
-  background-repeat: no-repeat;
 }
 .journal-sidebar > div > div:first-child { flex-wrap: wrap; gap: 8px; }
 .journal-footer {
@@ -192,8 +199,12 @@ body {
   grid-template-columns: min(17.6%, 206.4px) minmax(0, 1fr) min(31.2%, 312px) minmax(0, 1fr) min(17.6%, 211.2px);
   align-items: end;
   container-type: inline-size;
-  min-height: 150px;
-  margin-top: auto;
+  min-height: 0;
+  /* Keep the artwork close to the calendar even when the viewport is taller. */
+  margin-top: 0;
+  position: relative;
+  z-index: 2;
+  pointer-events: none;
   flex-shrink: 0;
   padding-bottom: var(--journal-footer-padding);
 }
@@ -234,25 +245,25 @@ body {
   .journal-logo { width: 360px; }
 }
 @media (max-width: 1199px) {
-  .journal-brand { padding-left: 100px; gap: 20px; }
+  .journal-header { --curtain-width: 38%; }
+  .journal-brand { gap: 20px; }
   .journal-logo { width: 280px; }
   .journal-books { width: 140px; }
-  .journal-curtain { width: 38%; }
-  .journal-sidebar { --curtain-height: calc(38cqw * 288 / 628); }
 }
 @media (max-width: 1023px) {
   .journal-sidebar { padding-top: 0; }
-  .journal-footer { min-height: 115px; }
+  .nemo-journal { --journal-footer-overlap: 32px; }
 }
 @media (max-width: 899px) {
+  .journal-header { --brand-right: 0px; }
   .journal-curtain { display: none; }
 }
 @media (max-width: 639px) {
   .nemo-journal { --journal-bottom-padding: 8px; --journal-side-padding: 10px; --journal-month-nav-height: 48px; padding: 14px var(--journal-side-padding) var(--journal-bottom-padding); }
-  .journal-header { min-height: 126px; }
-  .journal-brand { min-height: 114px; gap: 12px; padding: 34px 0 0 68px; }
+  .journal-header { --banner-width: 74px; --banner-left: -6px; min-height: 100px; }
+  .journal-brand { min-height: 88px; gap: 12px; padding-top: 20px; }
   .journal-logo { width: min(100%, 280px); }
-  .journal-banner { --banner-width: 74px; left: -6px; top: -14px; }
+  .journal-banner { top: -14px; }
   .journal-books { width: 106px; }
   .journal-curtain { display: none; }
   .journal-actions { top: 0; right: 0; }
@@ -262,9 +273,7 @@ body {
   .journal-month-controls select { font-size: 25px; }
   .journal-month-controls span { font-size: 20px; }
   .journal-month-controls::before { top: -15px; width: 135px; height: 15px; }
-  .journal-calendar-frame { padding-top: 18px; }
-  .journal-calendar-grid > .grid:last-child > div { min-height: 100px; }
-  .journal-footer { min-height: 86px; }
+  .nemo-journal { --journal-footer-overlap: 22px; }
 }
 @media (max-width: 399px) {
   .journal-month-nav { flex-wrap: wrap; justify-content: flex-end; }

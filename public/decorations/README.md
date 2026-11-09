@@ -15,6 +15,9 @@
 - `botanical-corner-open.png` / `botanical-corner-right-open.png`: 現在の下部表示用。根元の下の直線だけを透過した派生画像（元画像は保持）
 - `open-book.png`: 下部中央の本と小花
 - `card-corner.png`: 細い金色の角飾り
+- `calendar-arcade-frame.png`: カレンダー本体の枠。採用案①の回廊アーチと一枚の葉を四隅に展開した生成画像。220pxで9分割し、32px幅で角を保って表示。
+- `card-vine-frame-v3.png`: 現在のカード用透過枠。v2を画像生成で編集し、対角の葉を大きめの自然な緑色へ変更。170pxで9分割、18px幅で表示。
+- `card-vine-frame-v2.png`: カード用の透過枠。左上の細い葉と右下の丸い葉を対角に配置した生成素材。RGBをカレンダー枠と同じ#c39a5bに統一し、150pxで9分割、18px幅で表示。旧版card-vine-frame.pngも保持。
 - `month-flourish.png`: 年月上の金色の罫線
 - `handdrawn-rule.png`: 元画像の中央の本の左下にある線を320×9pxで採取した透過PNG。筆跡の揺れ・かすれを保持
 - `handdrawn-double-rule.png`: 下部の上側に使う薄い二重線。元画像x275/y1032から310×12pxで採取し、2本の色・間隔・筆跡を保持
