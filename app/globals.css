@@ -172,6 +172,60 @@ body {
 .journal-calendar-grid { border: 0; border-radius: 25px; box-shadow: none; }
 .journal-calendar-grid > .grid:last-child > div { min-width: 0; min-height: 64px; }
 .journal-calendar-grid > .grid:last-child > div:nth-last-child(-n + 7) { border-bottom: 0; }
+
+.daily-journal {
+  position: relative;
+  margin-top: 8px;
+  padding: 4px 8px 6px;
+  border: 1px solid #dac298;
+  border-radius: 12px;
+  background: linear-gradient(115deg, #fffdf6, #fbf2e1);
+  color: #584633;
+  box-shadow: 0 3px 12px #73573512, inset 0 0 0 4px #fffaf0;
+}
+.daily-journal-header {
+  display: flex;
+  align-items: center;
+  gap: clamp(4px, 1vw, 10px);
+  margin-bottom: 2px;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+.daily-journal-header time { font-size: clamp(11px, 1.2vw, 12px); color: #735b45; }
+.daily-journal-header h2 {
+  color: #774653;
+  font-family: "Yu Mincho", "Hiragino Mincho ProN", serif;
+  font-size: clamp(12px, 1.6vw, 16px);
+  font-weight: 700;
+}
+.daily-journal-private { display: flex; align-items: center; gap: 3px; margin-inline-start: auto; font-size: 10px; color: #50634d; }
+.daily-journal-art { width: 67.2px; min-width: 0; height: auto; margin-inline-start: clamp(3px, 0.8vw, 8px); }
+@media (max-width: 639px) {
+  .daily-journal-art { width: 48px; }
+}
+.daily-journal-paper {
+  display: block;
+  width: 100%;
+  padding: 2px 8px;
+  border: 1px solid #dfcfb5;
+  border-radius: 9px;
+  background: repeating-linear-gradient(to bottom, transparent 0 19px, #e7d8bf 19px 20px) #fffcf4;
+  background-origin: content-box;
+  color: #4f4034;
+  font-size: 12px;
+  line-height: 20px;
+  resize: vertical;
+}
+.daily-journal-paper::placeholder { color: #786654; }
+.daily-journal-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 3px 8px; margin-top: 3px; font-size: 10px; }
+.daily-journal-actions p { margin-right: auto; }
+.daily-journal-actions p:empty { display: none; }
+.daily-journal-save { padding: 3px 9px; min-height: 24px; border: 1px solid #45604a; border-radius: 6px; background: #536b58; color: #fffdf6; font-size: 11px; }
+.daily-journal-save:hover:enabled { background: #425947; }
+.daily-journal-save:disabled { border-color: #d7cebb; background: #eee8da; color: #6d6252; }
+.daily-journal-paper:focus-visible,
+.daily-journal-save:focus-visible { outline: 2px solid #536b58; outline-offset: 2px; }
+
 .journal-sidebar {
   /* Start the cards 12px below the calendar frame, allowing curtain overlap. */
   padding-top: calc(var(--journal-month-nav-height) + var(--journal-month-nav-gap) + 12px);
@@ -213,7 +267,12 @@ body {
 .journal-footer-flower {
   width: 100%;
   height: auto;
-  transform: translate(calc(var(--journal-corner-inset) - var(--journal-side-padding)), 2.517986%);
+}
+.journal-footer-flower-left {
+  transform: translate(
+    calc(var(--journal-corner-inset) - var(--journal-side-padding)),
+    calc(2.517986% - clamp(18px, 3vw, 44px))
+  );
 }
 .journal-footer-flower-right {
   transform: translate(calc(var(--journal-side-padding) - var(--journal-corner-inset)), 2.011494%);

@@ -5,8 +5,10 @@ import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import { Calendar, CalendarEvent, IconItem } from '@/types/database';
 import { DEFAULT_ICONS } from '@/lib/constants';
+import { sortEventsByStartTime } from '@/lib/eventOrder';
 import { Header } from '@/components/Header';
 import { CalendarView } from '@/components/CalendarView';
+import { DailyJournal } from '@/components/DailyJournal';
 import { SidePanel } from '@/components/SidePanel';
 import { IconManageModal } from '@/components/IconManageModal';
 import { CalendarManagerModal } from '@/components/CalendarManagerModal';
@@ -32,6 +34,30 @@ export default function CalendarAppPage() {
   // カレンダー表示状態
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
   const [selectedDateStr, setSelectedDateStr] = useState<string>(formatDateKey(new Date()));
+  const [journalMonth, setJournalMonth] = useState<{ key: string; dates: Set<string> } | null>(null);
+  const [journalRevision, setJournalRevision] = useState(0);
+  const userId = user?.id;
+  const monthStart = formatDateKey(new Date(currentDate.getFullYear(), currentDate.getMonth(), 1));
+  const nextMonthStart = formatDateKey(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1));
+  const journalMonthKey = `${userId}:${monthStart}`;
+
+  useEffect(() => {
+    if (!userId) return;
+    const controller = new AbortController();
+
+    async function loadJournalDates() {
+      const { data, error } = await supabase.from('daily_journal')
+        .select('entry_date').eq('user_id', userId)
+        .gte('entry_date', monthStart).lt('entry_date', nextMonthStart)
+        .abortSignal(controller.signal);
+      if (!error && !controller.signal.aborted) {
+        setJournalMonth({ key: journalMonthKey, dates: new Set(data.map((entry) => entry.entry_date)) });
+      }
+    }
+
+    void loadJournalDates();
+    return () => controller.abort();
+  }, [journalMonthKey, journalRevision, monthStart, nextMonthStart, supabase, userId]);
 
   // データ状態
   const [events, setEvents] = useState<Record<string, CalendarEvent[]>>({});
@@ -498,13 +524,7 @@ export default function CalendarAppPage() {
     );
   }
 
-  const selectedDayEvents = [...(events[selectedDateStr] || [])].sort((a, b) => {
-    const timeA = a.start_time?.trim();
-    const timeB = b.start_time?.trim();
-    if (!timeA) return timeB ? 1 : 0;
-    if (!timeB) return -1;
-    return timeA.localeCompare(timeB);
-  });
+  const selectedDayEvents = sortEventsByStartTime(events[selectedDateStr]);
 
   return (
     <div className="nemo-journal mx-auto w-full max-w-[2240px]">
@@ -520,10 +540,12 @@ export default function CalendarAppPage() {
       {/* メインコンテンツ（2カラム） */}
       <div className="journal-content grid grid-cols-1 items-start gap-4 lg:grid-cols-[minmax(0,1fr)_300px] xl:gap-5">
         {/* 左: カレンダー */}
+        <div className="min-w-0">
         <CalendarView
           currentDate={currentDate}
           selectedDateStr={selectedDateStr}
           events={events}
+          journalDates={journalMonth?.key === journalMonthKey ? journalMonth.dates : undefined}
           onSelectDate={(d) => { setSelectedDateStr(d); setSelectedEvent(null); }}
           onSelectEvent={(event) => { setSelectedDateStr(event.date); setSelectedEvent(event); }}
           onOpenAddModal={(d) => {
@@ -536,6 +558,9 @@ export default function CalendarAppPage() {
           onChangeMonth={(year, month) => setCurrentDate(new Date(year, month, 1))}
           onToday={handleToday}
         />
+        {userId && <DailyJournal key={userId} userId={userId} date={selectedDateStr}
+          onSaved={() => setJournalRevision((value) => value + 1)} />}
+        </div>
 
         {/* 右: サイドパネル */}
         <SidePanel
@@ -555,7 +580,7 @@ export default function CalendarAppPage() {
       </div>
 
       <div className="journal-footer" aria-hidden="true">
-        <img src="/decorations/botanical-corner-open.png" alt="" className="journal-decoration journal-footer-flower" />
+        <img src="/decorations/botanical-corner-open.png" alt="" className="journal-decoration journal-footer-flower journal-footer-flower-left" />
         <span className="journal-footer-rule journal-footer-rule-left" />
         <img src="/decorations/open-book.png" alt="" className="journal-decoration journal-footer-book" />
         <span className="journal-footer-rule journal-footer-rule-right" />

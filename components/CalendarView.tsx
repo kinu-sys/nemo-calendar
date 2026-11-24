@@ -5,11 +5,13 @@ import { CalendarEvent } from '@/types/database';
 import { HandDrawnSvg } from './HandDrawnSvg';
 import Image from 'next/image';
 import { getJapaneseHolidays } from '@/lib/japaneseHolidays';
+import { sortEventsByStartTime } from '@/lib/eventOrder';
 
 interface CalendarViewProps {
   currentDate: Date;
   selectedDateStr: string;
   events: Record<string, CalendarEvent[]>;
+  journalDates?: ReadonlySet<string>;
   onSelectDate: (dateStr: string) => void;
   onSelectEvent: (event: CalendarEvent) => void;
   onOpenAddModal: (dateStr: string) => void;
@@ -23,6 +25,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
   currentDate,
   selectedDateStr,
   events,
+  journalDates,
   onSelectDate,
   onSelectEvent,
   onOpenAddModal,
@@ -63,11 +66,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
       isToday: isCurrentMonth && realToday.getDate() === day,
       isSelected: dateKey === selectedDateStr,
       holidayName: holidays.get(dateKey),
-      dayEvents: [...(events[dateKey] || [])].sort((a, b) => {
-        const timeA = a.start_time?.trim() || '';
-        const timeB = b.start_time?.trim() || '';
-        return timeA.localeCompare(timeB);
-      }),
+      dayEvents: sortEventsByStartTime(events[dateKey]),
     });
   }
 
@@ -162,6 +161,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
           {/* 当月セル */}
           {currentMonthDays.map((item, idx) => {
             const isRightEdge = (prevDays.length + idx + 1) % 7 === 0;
+            const hasJournal = journalDates?.has(item.dateKey);
 
             return (
               <div
@@ -179,8 +179,12 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                 }`}
               >
                 <div className="mb-0 flex flex-shrink-0 items-center justify-between">
-                  <span
-                    className={`tabular-nums text-[16px] font-bold inline-flex items-center justify-center ${
+                  <button
+                    type="button"
+                    aria-label={`${item.dateKey} の日記と予定を表示${hasJournal ? '（日記あり）' : ''}`}
+                    aria-pressed={item.isSelected}
+                    aria-controls="daily-journal"
+                    className={`min-h-7 min-w-7 rounded-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#657c66] tabular-nums text-[16px] font-bold inline-flex items-center justify-center ${
                       item.isToday
                         ? 'h-7 w-7 rounded-full border border-[#c3b779] bg-[#657c66] text-white shadow-[0_2px_6px_rgba(83,107,88,0.24)]'
                         : item.holidayName || item.dayOfWeek === 0
@@ -191,7 +195,11 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                     }`}
                   >
                     {item.day}
-                  </span>
+                  </button>
+                  {hasJournal && (
+                    <Image src="/decorations/journal-leaf-bookmark.png" alt="" title="日記あり"
+                      width={18} height={18} className="mr-1 h-[14px] w-[14px] sm:h-[18px] sm:w-[18px]" />
+                  )}
                 </div>
 
                 {item.holidayName && (
