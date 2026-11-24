@@ -43,7 +43,7 @@ export function getJapaneseHolidays(year: number): Map<string, string> {
   }
 
   // 日曜の祝日は、次の祝日でない日を振替休日にする。
-  for (const [key] of [...holidays]) {
+  for (const [key] of Array.from(holidays)) {
     const date = parseDateKey(key);
     if (date.getDay() !== 0) continue;
     const observed = new Date(date);
@@ -53,7 +53,7 @@ export function getJapaneseHolidays(year: number): Map<string, string> {
     holidays.set(toDateKey(observed), '振替休日');
   }
 
-  return new Map([...holidays].filter(([key]) => key.startsWith(`${year}-`)));
+  return new Map(Array.from(holidays).filter(([key]) => key.startsWith(`${year}-`)));
 }
 
 function toDateKey(date: Date): string {
